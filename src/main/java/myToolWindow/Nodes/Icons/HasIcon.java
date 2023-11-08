@@ -2,6 +2,7 @@ package myToolWindow.Nodes.Icons;
 
 import javax.swing.*;
 
-public interface HasIcon {
+public interface HasIcon
+{
     Icon getIcon();
 }

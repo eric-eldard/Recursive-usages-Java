@@ -21,25 +21,39 @@ import myToolWindow.Utils.TreeGenerator;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+
 import java.awt.*;
 
-public class MyToolWindow {
+public class MyToolWindow
+{
     private final JPanel generalPanel;
+
     private final JPanel bottomPanel;
+
     private final JBLoadingPanel loadingPanel;
+
     private final Project project;
+
     public Tree tree;
+
     private JBScrollPane treeView;
+
     private BackgroundableProcessIndicator progressIndicator;
+
     public boolean forcedCancel = false;
+
     // Actions
     private final FindUsagesAction findUsagesAction = new FindUsagesAction(this);
+
     private final StopFindUsagesAction stopFindUsagesAction = new StopFindUsagesAction(this);
+
     private final ExpandTreeAction expandTreeAction = new ExpandTreeAction(this);
+
     private final CollapseTreeAction collapseTreeAction = new CollapseTreeAction(this);
 
 
-    public MyToolWindow(Project p) {
+    public MyToolWindow(Project p)
+    {
         project = p;
         generalPanel = new JPanel(new BorderLayout());
 
@@ -56,17 +70,21 @@ public class MyToolWindow {
         loadingPanel.startLoading();
     }
 
-    private void setLoading(boolean isLoading) {
+    private void setLoading(boolean isLoading)
+    {
         bottomPanel.removeAll();
 
-        if (isLoading) {
+        if (isLoading)
+        {
             bottomPanel.add(loadingPanel);
 
             findUsagesAction.setEnabled(false);
             stopFindUsagesAction.setEnabled(true);
             expandTreeAction.setEnabled(false);
             collapseTreeAction.setEnabled(false);
-        } else {
+        }
+        else
+        {
             bottomPanel.add(treeView);
 
             findUsagesAction.setEnabled(true);
@@ -79,7 +97,8 @@ public class MyToolWindow {
     }
 
     @NotNull
-    private JComponent createToolbarPanel() {
+    private JComponent createToolbarPanel()
+    {
         DefaultActionGroup result = new DefaultActionGroup();
 
         result.add(findUsagesAction);
@@ -87,10 +106,13 @@ public class MyToolWindow {
         result.add(expandTreeAction);
         result.add(collapseTreeAction);
 
-        return ActionManager.getInstance().createActionToolbar(ActionPlaces.STRUCTURE_VIEW_TOOLBAR, result, true).getComponent();
+        return ActionManager.getInstance()
+            .createActionToolbar(ActionPlaces.STRUCTURE_VIEW_TOOLBAR, result, true)
+            .getComponent();
     }
 
-    public void createAndRenderTree(PsiMethodImpl element) {
+    public void createAndRenderTree(PsiMethodImpl element)
+    {
         setLoading(true);
 
         TreeGenerator treeGenerator = new TreeGenerator(this, project, element);
@@ -99,13 +121,15 @@ public class MyToolWindow {
         ProgressManager.getInstance().runProcessWithProgressAsynchronously(treeGenerator, progressIndicator);
     }
 
-    public void finishCreatingTree(Tree tree) {
+    public void finishCreatingTree(Tree tree)
+    {
         this.tree = tree;
         treeView = new JBScrollPane(tree);
         setLoading(false);
     }
 
-    public void stop() {
+    public void stop()
+    {
         tree = null;
         treeView.removeAll();
         forcedCancel = true;
@@ -113,7 +137,8 @@ public class MyToolWindow {
         setLoading(false);
     }
 
-    public JPanel getContent() {
+    public JPanel getContent()
+    {
         return generalPanel;
     }
 }

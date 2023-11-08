@@ -9,41 +9,53 @@ import myToolWindow.Nodes.Icons.HasIcon;
 
 import javax.swing.*;
 
-public class ClassNode implements UsageNode {
+public class ClassNode implements UsageNode
+{
     private final HasIcon iconContainer;
+
     private final PsiMethodImpl element;
+
     private boolean isCyclic = false;
 
-    public ClassNode(HasIcon iconContainer, PsiMethodImpl e) {
+    public ClassNode(HasIcon iconContainer, PsiMethodImpl e)
+    {
         this.iconContainer = iconContainer;
         this.element = e;
     }
 
     @Override
-    public Icon getIcon() {
-        if (isCyclic) {
+    public Icon getIcon()
+    {
+        if (isCyclic)
+        {
             return new RowIcon(iconContainer.getIcon(), AllIcons.Gutter.RecursiveMethod);
-        } else {
+        }
+        else
+        {
             return iconContainer.getIcon();
         }
     }
 
-    public void setIsCyclic() {
+    public void setIsCyclic()
+    {
         isCyclic = true;
     }
 
     @Override
-    public NavigatablePsiElement getElement() throws NullPointerException {
+    public NavigatablePsiElement getElement() throws NullPointerException
+    {
         return this.element;
     }
 
     @Override
-    public String getMainText() throws NullPointerException {
+    public String getMainText() throws NullPointerException
+    {
         return getElement().getName();
     }
 
     @Override
-    public String getAdditionalText() throws NullPointerException, PsiInvalidElementAccessException {
+    public String getAdditionalText() throws NullPointerException, PsiInvalidElementAccessException
+    {
         return " ← " + getElement().getOriginalElement().getContainingFile().getName();
     }
 }

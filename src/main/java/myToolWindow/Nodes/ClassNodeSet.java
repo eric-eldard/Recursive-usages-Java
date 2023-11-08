@@ -5,12 +5,16 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 
-public class ClassNodeSet {
-    final HashSet<ClassNode> set = new HashSet<>();
+public class ClassNodeSet
+{
+    private final HashSet<ClassNode> set = new HashSet<>();
 
-    public boolean contains(PsiMethodImpl methodImpl) {
-        for (ClassNode classNode : set) {
-            if (classNode.getElement().equals(methodImpl)) {
+    public boolean contains(PsiMethodImpl methodImpl)
+    {
+        for (ClassNode classNode : set)
+        {
+            if (classNode.getElement().equals(methodImpl))
+            {
                 return true;
             }
         }
@@ -18,14 +22,18 @@ public class ClassNodeSet {
         return false;
     }
 
-    public int size() {
+    public int size()
+    {
         return set.size();
     }
 
     @Nullable
-    public ClassNode find(PsiMethodImpl methodImpl) {
-        for (ClassNode classNode : set) {
-            if (classNode.getElement().equals(methodImpl)) {
+    public ClassNode find(PsiMethodImpl methodImpl)
+    {
+        for (ClassNode classNode : set)
+        {
+            if (classNode.getElement().equals(methodImpl))
+            {
                 return classNode;
             }
         }
@@ -33,11 +41,13 @@ public class ClassNodeSet {
         return null;
     }
 
-    public void add(ClassNode classNode) {
+    public void add(ClassNode classNode)
+    {
         set.add(classNode);
     }
 
-    public void clear() {
+    public void clear()
+    {
         set.clear();
     }
 }
