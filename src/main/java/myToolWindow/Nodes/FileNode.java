@@ -2,18 +2,18 @@ package myToolWindow.Nodes;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.psi.NavigatablePsiElement;
+import com.intellij.psi.impl.source.tree.java.PsiMethodReferenceExpressionImpl;
 import com.intellij.ui.RowIcon;
-import com.jetbrains.php.lang.psi.elements.impl.MethodReferenceImpl;
 import myToolWindow.Nodes.Icons.HasIcon;
 
 import javax.swing.*;
 
 public class FileNode implements UsageNode {
     private final HasIcon iconContainer;
-    private final MethodReferenceImpl element;
+    private final PsiMethodReferenceExpressionImpl element;
     private boolean isCyclic = false;
 
-    public FileNode(HasIcon iconContainer, MethodReferenceImpl e) {
+    public FileNode(HasIcon iconContainer, PsiMethodReferenceExpressionImpl e) {
         this.iconContainer = iconContainer;
         this.element = e;
     }

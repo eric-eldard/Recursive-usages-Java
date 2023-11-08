@@ -1,6 +1,6 @@
 package myToolWindow.Nodes;
 
-import com.jetbrains.php.lang.psi.elements.impl.MethodImpl;
+import com.intellij.psi.impl.source.PsiMethodImpl;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
@@ -8,7 +8,7 @@ import java.util.HashSet;
 public class ClassNodeSet {
     final HashSet<ClassNode> set = new HashSet<>();
 
-    public boolean contains(MethodImpl methodImpl) {
+    public boolean contains(PsiMethodImpl methodImpl) {
         for (ClassNode classNode : set) {
             if (classNode.getElement().equals(methodImpl)) {
                 return true;
@@ -23,7 +23,7 @@ public class ClassNodeSet {
     }
 
     @Nullable
-    public ClassNode find(MethodImpl methodImpl) {
+    public ClassNode find(PsiMethodImpl methodImpl) {
         for (ClassNode classNode : set) {
             if (classNode.getElement().equals(methodImpl)) {
                 return classNode;

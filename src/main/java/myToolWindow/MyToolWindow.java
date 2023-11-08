@@ -9,10 +9,10 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.impl.BackgroundableProcessIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
+import com.intellij.psi.impl.source.PsiMethodImpl;
 import com.intellij.ui.components.JBLoadingPanel;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.ui.components.JBScrollPane;
-import com.jetbrains.php.lang.psi.elements.impl.MethodImpl;
 import myToolWindow.Actions.CollapseTreeAction;
 import myToolWindow.Actions.ExpandTreeAction;
 import myToolWindow.Actions.FindUsagesAction;
@@ -90,7 +90,7 @@ public class MyToolWindow {
         return ActionManager.getInstance().createActionToolbar(ActionPlaces.STRUCTURE_VIEW_TOOLBAR, result, true).getComponent();
     }
 
-    public void createAndRenderTree(MethodImpl element) {
+    public void createAndRenderTree(PsiMethodImpl element) {
         setLoading(true);
 
         TreeGenerator treeGenerator = new TreeGenerator(this, project, element);

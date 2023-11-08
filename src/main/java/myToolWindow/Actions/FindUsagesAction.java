@@ -8,8 +8,8 @@ import com.intellij.openapi.editor.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.impl.source.PsiMethodImpl;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.jetbrains.php.lang.psi.elements.impl.MethodImpl;
 import myToolWindow.MyToolWindow;
 import org.jetbrains.annotations.NotNull;
 
@@ -55,7 +55,7 @@ public class FindUsagesAction extends AnAction {
                 PsiFile file = PsiDocumentManager.getInstance(project).getPsiFile(document);
                 if (file != null) {
 
-                    MethodImpl mel = PsiTreeUtil.findElementOfClassAtOffset(file, offset, MethodImpl.class, false);
+                    PsiMethodImpl mel = PsiTreeUtil.findElementOfClassAtOffset(file, offset, PsiMethodImpl.class, false);
                     if (mel != null) {
                         mtw.createAndRenderTree(mel);
                     }

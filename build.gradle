@@ -3,7 +3,6 @@ plugins {
 }
 
 group 'org.endpointdeps'
-version pluginVersion
 
 repositories {
     mavenCentral()
@@ -23,7 +22,6 @@ intellij {
 
     plugins = [
         'java',
-        "com.jetbrains.php:${phpPluginVersion}",
         'properties',
         "PsiViewer:${psiViewerPluginVersion}",
     ]

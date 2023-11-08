@@ -1,5 +1,11 @@
 package myToolWindow.Utils;
 
+import java.util.HashSet;
+
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
+
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
@@ -10,36 +16,29 @@ import com.intellij.psi.NavigatablePsiElement;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.impl.source.PsiMethodImpl;
+import com.intellij.psi.impl.source.tree.java.PsiMethodReferenceExpressionImpl;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.Query;
-import com.jetbrains.php.lang.documentation.phpdoc.psi.impl.PhpDocRefImpl;
-import com.jetbrains.php.lang.psi.elements.PhpPsiElement;
-import com.jetbrains.php.lang.psi.elements.impl.MethodImpl;
-import com.jetbrains.php.lang.psi.elements.impl.MethodReferenceImpl;
 import myToolWindow.MyToolWindow;
-import myToolWindow.TreeRenderer;
 import myToolWindow.Nodes.ClassNode;
 import myToolWindow.Nodes.ClassNodeSet;
 import myToolWindow.Nodes.UsageNode;
 import myToolWindow.Nodes.UsageNodeFactory;
+import myToolWindow.TreeRenderer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
-import java.util.HashSet;
 
 public class TreeGenerator extends Task.Backgroundable {
     private final ClassNodeSet classNodeSet = new ClassNodeSet();
     private final TreeRenderer renderer;
-    private final MethodImpl element;
+    private final PsiMethodImpl element;
     private final MyToolWindow mtw;
     private ProgressIndicator indicator;
 
-    public TreeGenerator(MyToolWindow tw, @Nullable Project project, MethodImpl e) {
+    public TreeGenerator(MyToolWindow tw, @Nullable Project project, PsiMethodImpl e) {
         super(project, "Generating Tree Of Usages", false);
         mtw = tw;
         renderer = new TreeRenderer();
@@ -71,9 +70,9 @@ public class TreeGenerator extends Task.Backgroundable {
         }
     }
 
-    private Tree generateUsageTree(MethodImpl element) throws ProcessCanceledException {
+    private Tree generateUsageTree(PsiMethodImpl element) throws ProcessCanceledException {
         classNodeSet.clear();
-        ClassNode classNode = (ClassNode) UsageNodeFactory.createMethodNode(element, indicator);
+        ClassNode classNode = (ClassNode) UsageNodeFactory.createMethodNode(element);
         classNodeSet.add(classNode);
         DefaultMutableTreeNode topElement = new DefaultMutableTreeNode(classNode);
 
@@ -82,10 +81,10 @@ public class TreeGenerator extends Task.Backgroundable {
         return configureTree(usageTree);
     }
 
-    private DefaultMutableTreeNode recursiveGenerator(MethodImpl element, DefaultMutableTreeNode root) throws ProcessCanceledException {
+    private DefaultMutableTreeNode recursiveGenerator(PsiMethodImpl element, DefaultMutableTreeNode root) throws ProcessCanceledException {
         Query<PsiReference> query = ReferencesSearch.search(element);
         // I'm using set in this place to get references to unique methods
-        HashSet<PhpPsiElement> set = new HashSet<>();
+        HashSet<PsiElement> set = new HashSet<>();
 
         for (PsiReference psiReference : query) {
             indicator.checkCanceled();
@@ -93,31 +92,28 @@ public class TreeGenerator extends Task.Backgroundable {
             PsiFile file = el.getContainingFile();
             final int offset = el.getTextOffset();
 
-            MethodImpl methodImpl = PsiTreeUtil.findElementOfClassAtOffset(file, offset, MethodImpl.class, false);
+            PsiMethodImpl methodImpl = PsiTreeUtil.findElementOfClassAtOffset(file, offset, PsiMethodImpl.class, false);
 
             if (methodImpl != null) {
                 set.add(methodImpl);
             } else {
-                MethodReferenceImpl methodReferenceImpl = PsiTreeUtil.findElementOfClassAtOffset(file, offset, MethodReferenceImpl.class, false);
+                PsiMethodReferenceExpressionImpl
+                    methodReferenceImpl = PsiTreeUtil.findElementOfClassAtOffset(file, offset, PsiMethodReferenceExpressionImpl.class, false);
 
                 if (methodReferenceImpl != null) {
                     set.add(methodReferenceImpl);
                 } else {
-                    if (el instanceof PhpDocRefImpl) {
-
-                    } else {
-                        System.out.println("Not recognized element");
-                    }
+                    System.out.println("Not recognized element");
                 }
             }
         }
 
-        for (PhpPsiElement setElement : set) {
+        for (PsiElement setElement : set) {
             indicator.checkCanceled();
-            if (setElement instanceof MethodImpl) {
-                MethodImpl methodImpl = (MethodImpl) setElement;
+            if (setElement instanceof PsiMethodImpl) {
+                PsiMethodImpl methodImpl = (PsiMethodImpl) setElement;
                 if (!classNodeSet.contains(methodImpl)) {
-                    ClassNode caller = (ClassNode) UsageNodeFactory.createMethodNode(methodImpl, indicator);
+                    ClassNode caller = (ClassNode) UsageNodeFactory.createMethodNode(methodImpl);
                     DefaultMutableTreeNode callerNode = new DefaultMutableTreeNode(caller);
 
                     root.add(callerNode);
@@ -131,7 +127,7 @@ public class TreeGenerator extends Task.Backgroundable {
                     }
                 }
             } else {
-                MethodReferenceImpl methodReferenceImpl = (MethodReferenceImpl) setElement;
+                PsiMethodReferenceExpressionImpl methodReferenceImpl = (PsiMethodReferenceExpressionImpl) setElement;
 
                 UsageNode caller = UsageNodeFactory.createFileNode(methodReferenceImpl);
                 DefaultMutableTreeNode callerNode = new DefaultMutableTreeNode(caller);
