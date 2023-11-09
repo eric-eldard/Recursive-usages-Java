@@ -63,7 +63,6 @@ public class FindUsagesAction extends AnAction
                 PsiFile file = PsiDocumentManager.getInstance(project).getPsiFile(document);
                 if (file != null)
                 {
-
                     PsiMethodImpl mel = 
                         PsiTreeUtil.findElementOfClassAtOffset(file, offset, PsiMethodImpl.class, false);
                     if (mel != null)

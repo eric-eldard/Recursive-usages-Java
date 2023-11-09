@@ -5,15 +5,15 @@ import javax.swing.Icon;
 import com.intellij.icons.AllIcons;
 import myToolWindow.Nodes.Icons.HasIcon;
 
-public class MethodNode implements HasIcon
+public class TestNode implements HasIcon
 {
-    public MethodNode()
+    public TestNode()
     {
     }
 
     @Override
     public Icon getIcon()
     {
-        return AllIcons.Nodes.Method;
+        return AllIcons.Actions.StartDebugger;
     }
 }
