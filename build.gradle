@@ -1,35 +1,33 @@
 plugins {
-    id 'org.jetbrains.intellij' version '0.4.11'
+    id "org.jetbrains.intellij" version "1.16.0"
 }
 
-group 'org.endpointdeps'
+group = "org.endpointdeps"
+version = pluginVersion
 
 repositories {
     mavenCentral()
-}
-
-dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    gradlePluginPortal()
 }
 
 def htmlFixer = { htmlFile -> file(htmlFile).text.replace('<html>', '').replace('</html>', '') }
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version ideaVersion
+    version = ideaVersion
 
     updateSinceUntilBuild = false // disable building for each major version
 
     plugins = [
-        'java',
-        'properties',
-        "PsiViewer:${psiViewerPluginVersion}",
+        "java",
+        "properties",
+        "PsiViewer:${psiViewerPluginVersion}"
     ]
 }
 
 patchPluginXml {
-    sinceBuild        = "171.1834.9"
+    sinceBuild        = "232"
     untilBuild        = ""
-    changeNotes       = htmlFixer('src/main/resources/META-INF/change-notes.html')
-    pluginDescription = htmlFixer('src/main/resources/META-INF/description.html')
+    changeNotes       = htmlFixer("src/main/resources/META-INF/change-notes.html")
+    pluginDescription = htmlFixer("src/main/resources/META-INF/description.html")
 }
