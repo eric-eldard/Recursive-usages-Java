@@ -30,7 +30,7 @@ public class FindUsagesAction extends AnAction
 
     public FindUsagesAction(MyToolWindow tw)
     {
-        super("Build A Tree Of Usages", "Build a tree of usages", AllIcons.RunConfigurations.TestState.Run);
+        super("Build a Tree of Usages", "Build a tree of usages", AllIcons.RunConfigurations.TestState.Run);
         mtw = tw;
     }
 

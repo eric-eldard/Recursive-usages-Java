@@ -19,7 +19,7 @@ public class StopFindUsagesAction extends AnAction
 
     public StopFindUsagesAction(MyToolWindow tw)
     {
-        super("Stop Building A Tree Of Usages", "Stop building a tree of usages", AllIcons.Actions.Suspend);
+        super("Stop Building a Tree of Usages", "Stop building a tree of usages", AllIcons.Actions.Suspend);
         mtw = tw;
     }
 

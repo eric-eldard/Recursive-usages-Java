@@ -50,7 +50,7 @@ public class TreeGenerator extends Task.Backgroundable
 
     public TreeGenerator(MyToolWindow tw, @Nullable Project project, PsiMethodImpl e)
     {
-        super(project, "Generating Tree Of Usages", false);
+        super(project, "Generating Tree of Usages", false);
         mtw = tw;
         renderer = new TreeRenderer();
         element = e;
