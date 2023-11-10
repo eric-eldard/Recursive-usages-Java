@@ -1,6 +1,6 @@
 package myToolWindow.Nodes.Icons;
 
-import javax.swing.*;
+import javax.swing.Icon;
 
 public interface HasIcon
 {

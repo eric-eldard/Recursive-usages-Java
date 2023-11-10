@@ -1,11 +1,13 @@
 package myToolWindow.Utils;
 
-import java.util.HashSet;
+import java.util.Comparator;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import com.google.common.collect.SortedMultiset;
+import com.google.common.collect.TreeMultiset;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
@@ -20,6 +22,7 @@ import com.intellij.psi.impl.source.PsiMethodImpl;
 import com.intellij.psi.impl.source.tree.java.PsiMethodReferenceExpressionImpl;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.testIntegration.TestFinderHelper;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.Query;
 import myToolWindow.MyToolWindow;
@@ -31,6 +34,8 @@ import myToolWindow.TreeRenderer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+// TODO Show multiple paths through the same method
+// TODO Add support for inheritance
 public class TreeGenerator extends Task.Backgroundable
 {
     private final ClassNodeSet classNodeSet = new ClassNodeSet();
@@ -88,7 +93,7 @@ public class TreeGenerator extends Task.Backgroundable
     private Tree generateUsageTree(PsiMethodImpl element) throws ProcessCanceledException
     {
         classNodeSet.clear();
-        ClassNode classNode = (ClassNode) UsageNodeFactory.createMethodNode(element);
+        ClassNode classNode = (ClassNode) UsageNodeFactory.createMethodNode(element, 1);
         classNodeSet.add(classNode);
         DefaultMutableTreeNode topElement = new DefaultMutableTreeNode(classNode);
 
@@ -101,8 +106,13 @@ public class TreeGenerator extends Task.Backgroundable
         throws ProcessCanceledException
     {
         Query<PsiReference> query = ReferencesSearch.search(element);
-        // I'm using set in this place to get references to unique methods
-        HashSet<PsiElement> set = new HashSet<>();
+
+        SortedMultiset<NavigatablePsiElement> psiElements = TreeMultiset.create(Comparator
+            .comparing(TestFinderHelper::isTest)                             // sort tests to bottom
+            .thenComparing(elem -> elem.getContainingFile().getName())       // then sort by containing file
+            .thenComparing(elem -> ((NavigatablePsiElement) elem).getName()) // then sort by method name
+            .thenComparingInt(PsiElement::hashCode) // distinguish between overloads of the same method
+        );
 
         for (PsiReference psiReference : query)
         {
@@ -115,7 +125,7 @@ public class TreeGenerator extends Task.Backgroundable
 
             if (methodImpl != null)
             {
-                set.add(methodImpl);
+                psiElements.add(methodImpl);
             }
             else
             {
@@ -124,24 +134,24 @@ public class TreeGenerator extends Task.Backgroundable
 
                 if (methodReferenceImpl != null)
                 {
-                    set.add(methodReferenceImpl);
+                    psiElements.add(methodReferenceImpl);
                 }
                 else
                 {
-                    System.out.println("Not recognized element");
+                    System.out.println("Unrecognized element");
                 }
             }
         }
 
-        for (PsiElement setElement : set)
+        for (NavigatablePsiElement psiElement : psiElements.elementSet())
         {
             indicator.checkCanceled();
-            if (setElement instanceof PsiMethodImpl)
+            if (psiElement instanceof PsiMethodImpl methodImpl)
             {
-                PsiMethodImpl methodImpl = (PsiMethodImpl) setElement;
-                if (!classNodeSet.contains(methodImpl))
+                if (!classNodeSet.contains(methodImpl)) // The else condition prevents infinite recursion
                 {
-                    ClassNode caller = (ClassNode) UsageNodeFactory.createMethodNode(methodImpl);
+                    int occurrences = psiElements.count(psiElement);
+                    ClassNode caller = (ClassNode) UsageNodeFactory.createMethodNode(methodImpl, occurrences);
                     DefaultMutableTreeNode callerNode = new DefaultMutableTreeNode(caller);
 
                     root.add(callerNode);
@@ -154,13 +164,13 @@ public class TreeGenerator extends Task.Backgroundable
                     ClassNode classNode = classNodeSet.find(element);
                     if (classNode != null)
                     {
-                        classNode.setIsCyclic();
+                        //classNode.setIsCyclic(); // TODO This has always actually meant isDuplicate, not cyclic
                     }
                 }
             }
             else
             {
-                PsiMethodReferenceExpressionImpl methodReferenceImpl = (PsiMethodReferenceExpressionImpl) setElement;
+                PsiMethodReferenceExpressionImpl methodReferenceImpl = (PsiMethodReferenceExpressionImpl) psiElement;
 
                 UsageNode caller = UsageNodeFactory.createFileNode(methodReferenceImpl);
                 DefaultMutableTreeNode callerNode = new DefaultMutableTreeNode(caller);

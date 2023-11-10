@@ -1,5 +1,11 @@
 package myToolWindow;
 
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+
 import com.intellij.ide.ActivityTracker;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionManager;
@@ -11,18 +17,14 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.psi.impl.source.PsiMethodImpl;
 import com.intellij.ui.components.JBLoadingPanel;
-import com.intellij.ui.treeStructure.Tree;
 import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.treeStructure.Tree;
 import myToolWindow.Actions.CollapseTreeAction;
 import myToolWindow.Actions.ExpandTreeAction;
 import myToolWindow.Actions.FindUsagesAction;
 import myToolWindow.Actions.StopFindUsagesAction;
 import myToolWindow.Utils.TreeGenerator;
 import org.jetbrains.annotations.NotNull;
-
-import javax.swing.*;
-
-import java.awt.*;
 
 public class MyToolWindow
 {

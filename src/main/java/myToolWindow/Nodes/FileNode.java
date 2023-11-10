@@ -1,12 +1,12 @@
 package myToolWindow.Nodes;
 
+import javax.swing.Icon;
+
 import com.intellij.icons.AllIcons;
 import com.intellij.psi.NavigatablePsiElement;
 import com.intellij.psi.impl.source.tree.java.PsiMethodReferenceExpressionImpl;
 import com.intellij.ui.RowIcon;
 import myToolWindow.Nodes.Icons.HasIcon;
-
-import javax.swing.*;
 
 public class FileNode implements UsageNode
 {
@@ -41,13 +41,13 @@ public class FileNode implements UsageNode
     }
 
     @Override
-    public NavigatablePsiElement getElement() throws NullPointerException
+    public NavigatablePsiElement getElement()
     {
         return this.element;
     }
 
     @Override
-    public String getMainText() throws NullPointerException
+    public String getMainText()
     {
         return getElement().getContainingFile().getName();
     }

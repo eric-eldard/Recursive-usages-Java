@@ -1,13 +1,12 @@
 package myToolWindow;
 
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+
 import com.intellij.ide.util.treeView.NodeRenderer;
-import com.intellij.psi.PsiInvalidElementAccessException;
 import com.intellij.ui.SimpleTextAttributes;
 import myToolWindow.Nodes.UsageNode;
 import org.jetbrains.annotations.NotNull;
-
-import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
 
 public class TreeRenderer extends NodeRenderer
 {
@@ -26,7 +25,7 @@ public class TreeRenderer extends NodeRenderer
                 append(node.getMainText(), SimpleTextAttributes.REGULAR_ATTRIBUTES, true);
                 append(node.getAdditionalText(), SimpleTextAttributes.GRAYED_ATTRIBUTES, false);
             }
-            catch (NullPointerException | PsiInvalidElementAccessException e)
+            catch (Exception e)
             {
                 append("Error", SimpleTextAttributes.ERROR_ATTRIBUTES);
             }

@@ -1,13 +1,12 @@
 package myToolWindow.Nodes;
 
+import javax.swing.Icon;
+
 import com.intellij.icons.AllIcons;
 import com.intellij.psi.NavigatablePsiElement;
-import com.intellij.psi.PsiInvalidElementAccessException;
 import com.intellij.psi.impl.source.PsiMethodImpl;
 import com.intellij.ui.RowIcon;
 import myToolWindow.Nodes.Icons.HasIcon;
-
-import javax.swing.*;
 
 public class ClassNode implements UsageNode
 {
@@ -15,12 +14,15 @@ public class ClassNode implements UsageNode
 
     private final PsiMethodImpl element;
 
+    private final int count;
+
     private boolean isCyclic = false;
 
-    public ClassNode(HasIcon iconContainer, PsiMethodImpl e)
+    public ClassNode(HasIcon iconContainer, PsiMethodImpl e, int count)
     {
         this.iconContainer = iconContainer;
         this.element = e;
+        this.count = count;
     }
 
     @Override
@@ -42,20 +44,28 @@ public class ClassNode implements UsageNode
     }
 
     @Override
-    public NavigatablePsiElement getElement() throws NullPointerException
+    public NavigatablePsiElement getElement()
     {
         return this.element;
     }
 
     @Override
-    public String getMainText() throws NullPointerException
+    public String getMainText()
     {
         return getElement().getName();
     }
 
     @Override
-    public String getAdditionalText() throws NullPointerException, PsiInvalidElementAccessException
+    public String getAdditionalText()
     {
-        return " ← " + getElement().getOriginalElement().getContainingFile().getName();
+        return " ← " + getElement().getOriginalElement().getContainingFile().getName() + makeMultiplicityLabel();
+    }
+
+    /**
+     * @return a multiplicity label for counts greater than 1: " (x2)"
+     */
+    private String makeMultiplicityLabel()
+    {
+        return count > 1 ? String.format(" (x%d)", count) : "";
     }
 }
