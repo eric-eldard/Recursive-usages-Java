@@ -1,4 +1,4 @@
-package myToolWindow.Actions;
+package toolOfUsages.action;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -14,12 +14,12 @@ import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.impl.source.PsiMethodImpl;
 import com.intellij.psi.util.PsiTreeUtil;
-import myToolWindow.MyToolWindow;
 import org.jetbrains.annotations.NotNull;
+import toolOfUsages.Plugin;
 
 public class FindUsagesAction extends AnAction
 {
-    public MyToolWindow mtw;
+    public Plugin mtw;
 
     private boolean enabled = true;
 
@@ -28,7 +28,7 @@ public class FindUsagesAction extends AnAction
     {
     }
 
-    public FindUsagesAction(MyToolWindow tw)
+    public FindUsagesAction(Plugin tw)
     {
         super("Build a Tree of Usages", "Build a tree of usages", AllIcons.RunConfigurations.TestState.Run);
         mtw = tw;

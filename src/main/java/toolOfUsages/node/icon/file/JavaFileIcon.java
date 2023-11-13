@@ -1,13 +1,13 @@
-package myToolWindow.Nodes.Icons.FileNodes;
+package toolOfUsages.node.icon.file;
 
 import javax.swing.Icon;
 
 import com.intellij.util.PlatformIcons;
-import myToolWindow.Nodes.Icons.HasIcon;
+import toolOfUsages.node.icon.HasIcon;
 
-public class JavaFileNode implements HasIcon
+public class JavaFileIcon implements HasIcon
 {
-    public JavaFileNode()
+    public JavaFileIcon()
     {
     }
 

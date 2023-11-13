@@ -1,14 +1,14 @@
-package myToolWindow.Actions;
+package toolOfUsages.action;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import myToolWindow.MyToolWindow;
 import org.jetbrains.annotations.NotNull;
+import toolOfUsages.Plugin;
 
 public class StopFindUsagesAction extends AnAction
 {
-    public MyToolWindow mtw;
+    public Plugin mtw;
 
     private boolean enabled = false;
 
@@ -17,7 +17,7 @@ public class StopFindUsagesAction extends AnAction
     {
     }
 
-    public StopFindUsagesAction(MyToolWindow tw)
+    public StopFindUsagesAction(Plugin tw)
     {
         super("Stop Building a Tree of Usages", "Stop building a tree of usages", AllIcons.Actions.Suspend);
         mtw = tw;

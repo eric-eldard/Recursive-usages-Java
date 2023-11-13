@@ -1,46 +1,23 @@
-package myToolWindow.Nodes;
+package toolOfUsages.node;
 
-import javax.swing.Icon;
-
-import com.intellij.icons.AllIcons;
 import com.intellij.psi.NavigatablePsiElement;
 import com.intellij.psi.impl.source.PsiMethodImpl;
-import com.intellij.ui.RowIcon;
-import myToolWindow.Nodes.Icons.HasIcon;
+import toolOfUsages.node.icon.HasIcon;
 
-public class ClassNode implements UsageNode
+public class ClassNode extends UsageNode
 {
-    private final HasIcon iconContainer;
-
     private final PsiMethodImpl element;
 
+    /**
+     * The number of times the parent is invoked directly from this node
+     */
     private final int count;
 
-    private boolean isCyclic = false;
-
-    public ClassNode(HasIcon iconContainer, PsiMethodImpl e, int count)
+    public ClassNode(HasIcon iconContainer, PsiMethodImpl element, int count)
     {
-        this.iconContainer = iconContainer;
-        this.element = e;
+        super(iconContainer);
+        this.element = element;
         this.count = count;
-    }
-
-    @Override
-    public Icon getIcon()
-    {
-        if (isCyclic)
-        {
-            return new RowIcon(iconContainer.getIcon(), AllIcons.Gutter.RecursiveMethod);
-        }
-        else
-        {
-            return iconContainer.getIcon();
-        }
-    }
-
-    public void setIsCyclic()
-    {
-        isCyclic = true;
     }
 
     @Override

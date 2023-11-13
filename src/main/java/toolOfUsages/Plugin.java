@@ -1,4 +1,4 @@
-package myToolWindow;
+package toolOfUsages;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -19,14 +19,20 @@ import com.intellij.psi.impl.source.PsiMethodImpl;
 import com.intellij.ui.components.JBLoadingPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.treeStructure.Tree;
-import myToolWindow.Actions.CollapseTreeAction;
-import myToolWindow.Actions.ExpandTreeAction;
-import myToolWindow.Actions.FindUsagesAction;
-import myToolWindow.Actions.StopFindUsagesAction;
-import myToolWindow.Utils.TreeGenerator;
 import org.jetbrains.annotations.NotNull;
+import toolOfUsages.action.CollapseTreeAction;
+import toolOfUsages.action.ExpandTreeAction;
+import toolOfUsages.action.FindUsagesAction;
+import toolOfUsages.action.StopFindUsagesAction;
+import toolOfUsages.util.TreeGenerator;
 
-public class MyToolWindow
+/**
+ * Note that this warning may be logged when debugging and that it has no impact on IntelliJ or the plugin:
+ * <a href="https://github.com/JetBrains/gradle-intellij-plugin/issues/777">
+ *     Please call toolbar.setTargetComponent() explicitly
+ * </a>
+ */
+public class Plugin
 {
     private final JPanel generalPanel;
 
@@ -54,7 +60,7 @@ public class MyToolWindow
     private final CollapseTreeAction collapseTreeAction = new CollapseTreeAction(this);
 
 
-    public MyToolWindow(Project p)
+    public Plugin(Project p)
     {
         project = p;
         generalPanel = new JPanel(new BorderLayout());

@@ -22,13 +22,13 @@
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id="Tree of Usages" icon="AllIcons.Actions.Refresh" anchor="right" factoryClass="myToolWindow.MyToolWindowFactory"/>
+        <toolWindow id="Tree of Usages" icon="AllIcons.Actions.Refresh" anchor="right" factoryClass="toolOfUsages.PluginFactory"/>
     </extensions>
 
     <actions>
-        <action id="myToolWindow.Actions.FindUsagesAction" class="myToolWindow.Actions.FindUsagesAction" text="Build a Tree of Usages"/>
-        <action id="myToolWindow.Actions.StopFindUsagesAction" class="myToolWindow.Actions.StopFindUsagesAction" text="Stop Building a Tree of Usages"/>
-        <action id="myToolWindow.Actions.ExpandTreeAction" class="myToolWindow.Actions.ExpandTreeAction" text="Expand All"/>
-        <action id="myToolWindow.Actions.CollapseTreeAction" class="myToolWindow.Actions.CollapseTreeAction" text="Collapse All"/>
+        <action id="toolOfUsages.action.FindUsagesAction" class="toolOfUsages.action.FindUsagesAction" text="Build a Tree of Usages"/>
+        <action id="toolOfUsages.action.StopFindUsagesAction" class="toolOfUsages.action.StopFindUsagesAction" text="Stop Building a Tree of Usages"/>
+        <action id="toolOfUsages.action.ExpandTreeAction" class="toolOfUsages.action.ExpandTreeAction" text="Expand All"/>
+        <action id="toolOfUsages.action.CollapseTreeAction" class="toolOfUsages.action.CollapseTreeAction" text="Collapse All"/>
     </actions>
 </idea-plugin>

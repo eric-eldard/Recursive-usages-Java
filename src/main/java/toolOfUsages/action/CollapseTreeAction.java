@@ -1,25 +1,25 @@
-package myToolWindow.Actions;
+package toolOfUsages.action;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import myToolWindow.MyToolWindow;
 import org.jetbrains.annotations.NotNull;
+import toolOfUsages.Plugin;
 
-public class ExpandTreeAction extends AnAction
+public class CollapseTreeAction extends AnAction
 {
-    public MyToolWindow mtw;
+    public Plugin mtw;
 
     private boolean enabled = true;
 
     @SuppressWarnings("unused")
-    public ExpandTreeAction()
+    public CollapseTreeAction()
     {
     }
 
-    public ExpandTreeAction(MyToolWindow tw)
+    public CollapseTreeAction(Plugin tw)
     {
-        super("Expand All", "Expand all", AllIcons.Actions.Expandall);
+        super("Collapse All", "Collapse all", AllIcons.Actions.Collapseall);
         mtw = tw;
     }
 
@@ -42,9 +42,9 @@ public class ExpandTreeAction extends AnAction
     {
         if (mtw.tree != null)
         {
-            for (int i = 0; i < mtw.tree.getRowCount(); i++)
+            for (int i = mtw.tree.getRowCount() - 1; i >= 0; i--)
             {
-                mtw.tree.expandRow(i);
+                mtw.tree.collapseRow(i);
             }
         }
     }

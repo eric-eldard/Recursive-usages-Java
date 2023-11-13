@@ -1,13 +1,13 @@
-package myToolWindow.Nodes.Icons.ClassNodes;
+package toolOfUsages.node.icon.method;
 
 import javax.swing.Icon;
 
 import com.intellij.icons.AllIcons;
-import myToolWindow.Nodes.Icons.HasIcon;
+import toolOfUsages.node.icon.HasIcon;
 
-public class MethodNode implements HasIcon
+public class MethodIcon implements HasIcon
 {
-    public MethodNode()
+    public MethodIcon()
     {
     }
 

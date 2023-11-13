@@ -1,4 +1,4 @@
-package myToolWindow.Utils;
+package toolOfUsages.util;
 
 import java.util.Comparator;
 
@@ -25,30 +25,26 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.testIntegration.TestFinderHelper;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.Query;
-import myToolWindow.MyToolWindow;
-import myToolWindow.Nodes.ClassNode;
-import myToolWindow.Nodes.ClassNodeSet;
-import myToolWindow.Nodes.UsageNode;
-import myToolWindow.Nodes.UsageNodeFactory;
-import myToolWindow.TreeRenderer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import toolOfUsages.Plugin;
+import toolOfUsages.TreeRenderer;
+import toolOfUsages.node.ClassNode;
+import toolOfUsages.node.UsageNode;
+import toolOfUsages.node.UsageNodeFactory;
 
-// TODO Show multiple paths through the same method
 // TODO Add support for inheritance
 public class TreeGenerator extends Task.Backgroundable
 {
-    private final ClassNodeSet classNodeSet = new ClassNodeSet();
-
     private final TreeRenderer renderer;
 
     private final PsiMethodImpl element;
 
-    private final MyToolWindow mtw;
+    private final Plugin mtw;
 
     private ProgressIndicator indicator;
 
-    public TreeGenerator(MyToolWindow tw, @Nullable Project project, PsiMethodImpl e)
+    public TreeGenerator(Plugin tw, @Nullable Project project, PsiMethodImpl e)
     {
         super(project, "Generating Tree of Usages", false);
         mtw = tw;
@@ -92,20 +88,18 @@ public class TreeGenerator extends Task.Backgroundable
 
     private Tree generateUsageTree(PsiMethodImpl element) throws ProcessCanceledException
     {
-        classNodeSet.clear();
         ClassNode classNode = (ClassNode) UsageNodeFactory.createMethodNode(element, 1);
-        classNodeSet.add(classNode);
-        DefaultMutableTreeNode topElement = new DefaultMutableTreeNode(classNode);
+        DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(classNode);
+        recursiveGenerator(rootNode);
 
-        DefaultMutableTreeNode usageTree = recursiveGenerator(element, topElement);
-
-        return configureTree(usageTree);
+        return configureTree(rootNode);
     }
 
-    private DefaultMutableTreeNode recursiveGenerator(PsiMethodImpl element, DefaultMutableTreeNode root)
+    private DefaultMutableTreeNode recursiveGenerator(DefaultMutableTreeNode parentNode)
         throws ProcessCanceledException
     {
-        Query<PsiReference> query = ReferencesSearch.search(element);
+        PsiElement currentElement = ((UsageNode) parentNode.getUserObject()).getElement();
+        Query<PsiReference> query = ReferencesSearch.search(currentElement);
 
         SortedMultiset<NavigatablePsiElement> psiElements = TreeMultiset.create(Comparator
             .comparing(TestFinderHelper::isTest)                             // sort tests to bottom
@@ -148,24 +142,28 @@ public class TreeGenerator extends Task.Backgroundable
             indicator.checkCanceled();
             if (psiElement instanceof PsiMethodImpl methodImpl)
             {
-                if (!classNodeSet.contains(methodImpl)) // The else condition prevents infinite recursion
+                int occurrences = psiElements.count(psiElement);
+                ClassNode callingMethod = (ClassNode) UsageNodeFactory.createMethodNode(methodImpl, occurrences);
+                DefaultMutableTreeNode callingNode = new DefaultMutableTreeNode(callingMethod);
+
+                parentNode.add(callingNode);
+                
+                // Detect cyclical ancestors (null parent signals you've reached the root node)
+                DefaultMutableTreeNode identicalAncestorNode = parentNode;
+                while (identicalAncestorNode != null && !sameNode(callingNode, identicalAncestorNode))
                 {
-                    int occurrences = psiElements.count(psiElement);
-                    ClassNode caller = (ClassNode) UsageNodeFactory.createMethodNode(methodImpl, occurrences);
-                    DefaultMutableTreeNode callerNode = new DefaultMutableTreeNode(caller);
-
-                    root.add(callerNode);
-                    classNodeSet.add(caller);
-
-                    recursiveGenerator(methodImpl, callerNode);
+                    identicalAncestorNode = (DefaultMutableTreeNode) identicalAncestorNode.getParent();
+                }
+                
+                if (identicalAncestorNode == null)
+                {
+                    // no cyclical ancestor; continue recursing
+                    recursiveGenerator(callingNode);
                 }
                 else
                 {
-                    ClassNode classNode = classNodeSet.find(element);
-                    if (classNode != null)
-                    {
-                        //classNode.setIsCyclic(); // TODO This has always actually meant isDuplicate, not cyclic
-                    }
+                    // stop recursing and mark as cyclic
+                    callingMethod.setIsCyclic();
                 }
             }
             else
@@ -173,13 +171,20 @@ public class TreeGenerator extends Task.Backgroundable
                 PsiMethodReferenceExpressionImpl methodReferenceImpl = (PsiMethodReferenceExpressionImpl) psiElement;
 
                 UsageNode caller = UsageNodeFactory.createFileNode(methodReferenceImpl);
-                DefaultMutableTreeNode callerNode = new DefaultMutableTreeNode(caller);
+                DefaultMutableTreeNode callingNode = new DefaultMutableTreeNode(caller);
 
-                root.add(callerNode);
+                parentNode.add(callingNode);
             }
         }
 
-        return root;
+        return parentNode;
+    }
+    
+    private boolean sameNode(@NotNull DefaultMutableTreeNode nodeA, @NotNull DefaultMutableTreeNode nodeB)
+    {
+        NavigatablePsiElement elementA = ((UsageNode) nodeA.getUserObject()).getElement();
+        NavigatablePsiElement elementB = ((UsageNode) nodeB.getUserObject()).getElement();
+        return elementA.equals(elementB);
     }
 
     private Tree configureTree(DefaultMutableTreeNode top)
