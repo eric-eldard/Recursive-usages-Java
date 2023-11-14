@@ -1,9 +1,9 @@
-package toolOfUsages.node.icon.file;
+package treeOfUsages.node.icon.file;
 
 import javax.swing.Icon;
 
 import com.intellij.util.PlatformIcons;
-import toolOfUsages.node.icon.HasIcon;
+import treeOfUsages.node.icon.HasIcon;
 
 public class JavaFileIcon implements HasIcon
 {

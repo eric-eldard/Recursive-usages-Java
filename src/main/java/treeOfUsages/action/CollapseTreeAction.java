@@ -1,10 +1,10 @@
-package toolOfUsages.action;
+package treeOfUsages.action;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import org.jetbrains.annotations.NotNull;
-import toolOfUsages.Plugin;
+import treeOfUsages.Plugin;
 
 public class CollapseTreeAction extends AnAction
 {

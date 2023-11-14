@@ -1,4 +1,4 @@
-package toolOfUsages;
+package treeOfUsages;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -20,11 +20,11 @@ import com.intellij.ui.components.JBLoadingPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.treeStructure.Tree;
 import org.jetbrains.annotations.NotNull;
-import toolOfUsages.action.CollapseTreeAction;
-import toolOfUsages.action.ExpandTreeAction;
-import toolOfUsages.action.FindUsagesAction;
-import toolOfUsages.action.StopFindUsagesAction;
-import toolOfUsages.util.TreeGenerator;
+import treeOfUsages.action.CollapseTreeAction;
+import treeOfUsages.action.ExpandTreeAction;
+import treeOfUsages.action.FindUsagesAction;
+import treeOfUsages.action.StopFindUsagesAction;
+import treeOfUsages.util.TreeGenerator;
 
 /**
  * Note that this warning may be logged when debugging and that it has no impact on IntelliJ or the plugin:

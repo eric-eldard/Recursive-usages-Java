@@ -1,4 +1,4 @@
-package toolOfUsages.util;
+package treeOfUsages.util;
 
 import java.util.Comparator;
 
@@ -27,11 +27,11 @@ import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.Query;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import toolOfUsages.Plugin;
-import toolOfUsages.TreeRenderer;
-import toolOfUsages.node.ClassNode;
-import toolOfUsages.node.UsageNode;
-import toolOfUsages.node.UsageNodeFactory;
+import treeOfUsages.Plugin;
+import treeOfUsages.TreeRenderer;
+import treeOfUsages.node.ClassNode;
+import treeOfUsages.node.UsageNode;
+import treeOfUsages.node.UsageNodeFactory;
 
 // TODO Add support for inheritance
 public class TreeGenerator extends Task.Backgroundable

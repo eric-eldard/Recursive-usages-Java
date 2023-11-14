@@ -1,12 +1,12 @@
-package toolOfUsages.node;
+package treeOfUsages.node;
 
 import com.intellij.psi.impl.source.PsiMethodImpl;
 import com.intellij.psi.impl.source.tree.java.PsiMethodReferenceExpressionImpl;
 import com.intellij.testIntegration.TestFinderHelper;
-import toolOfUsages.node.icon.method.MethodIcon;
-import toolOfUsages.node.icon.method.TestIcon;
-import toolOfUsages.node.icon.file.JavaFileIcon;
-import toolOfUsages.node.icon.HasIcon;
+import treeOfUsages.node.icon.method.MethodIcon;
+import treeOfUsages.node.icon.method.TestIcon;
+import treeOfUsages.node.icon.file.JavaFileIcon;
+import treeOfUsages.node.icon.HasIcon;
 
 public class UsageNodeFactory
 {

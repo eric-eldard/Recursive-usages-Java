@@ -1,4 +1,4 @@
-package toolOfUsages.action;
+package treeOfUsages.action;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -15,7 +15,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.impl.source.PsiMethodImpl;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
-import toolOfUsages.Plugin;
+import treeOfUsages.Plugin;
 
 public class FindUsagesAction extends AnAction
 {

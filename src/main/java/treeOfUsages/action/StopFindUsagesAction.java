@@ -1,25 +1,25 @@
-package toolOfUsages.action;
+package treeOfUsages.action;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import org.jetbrains.annotations.NotNull;
-import toolOfUsages.Plugin;
+import treeOfUsages.Plugin;
 
-public class ExpandTreeAction extends AnAction
+public class StopFindUsagesAction extends AnAction
 {
     public Plugin mtw;
 
-    private boolean enabled = true;
+    private boolean enabled = false;
 
     @SuppressWarnings("unused")
-    public ExpandTreeAction()
+    public StopFindUsagesAction()
     {
     }
 
-    public ExpandTreeAction(Plugin tw)
+    public StopFindUsagesAction(Plugin tw)
     {
-        super("Expand All", "Expand all", AllIcons.Actions.Expandall);
+        super("Stop Building a Tree of Usages", "Stop building a tree of usages", AllIcons.Actions.Suspend);
         mtw = tw;
     }
 
@@ -29,9 +29,7 @@ public class ExpandTreeAction extends AnAction
     }
 
     @Override
-    public void update(
-        @NotNull
-        AnActionEvent e)
+    public void update(@NotNull AnActionEvent e)
     {
         e.getPresentation().setEnabled(enabled);
         super.update(e);
@@ -40,12 +38,6 @@ public class ExpandTreeAction extends AnAction
     @Override
     public void actionPerformed(@NotNull AnActionEvent e)
     {
-        if (mtw.tree != null)
-        {
-            for (int i = 0; i < mtw.tree.getRowCount(); i++)
-            {
-                mtw.tree.expandRow(i);
-            }
-        }
+        mtw.stop();
     }
 }

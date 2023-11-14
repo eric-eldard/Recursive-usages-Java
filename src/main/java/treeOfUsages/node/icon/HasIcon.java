@@ -1,4 +1,4 @@
-package toolOfUsages.node.icon;
+package treeOfUsages.node.icon;
 
 import javax.swing.Icon;
 

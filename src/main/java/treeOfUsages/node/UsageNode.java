@@ -1,11 +1,11 @@
-package toolOfUsages.node;
+package treeOfUsages.node;
 
 import javax.swing.Icon;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.psi.NavigatablePsiElement;
 import com.intellij.ui.RowIcon;
-import toolOfUsages.node.icon.HasIcon;
+import treeOfUsages.node.icon.HasIcon;
 
 public abstract class UsageNode implements HasIcon
 {

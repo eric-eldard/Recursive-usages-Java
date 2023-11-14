@@ -1,4 +1,4 @@
-package toolOfUsages;
+package treeOfUsages;
 
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -6,7 +6,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import com.intellij.ide.util.treeView.NodeRenderer;
 import com.intellij.ui.SimpleTextAttributes;
 import org.jetbrains.annotations.NotNull;
-import toolOfUsages.node.UsageNode;
+import treeOfUsages.node.UsageNode;
 
 public class TreeRenderer extends NodeRenderer
 {

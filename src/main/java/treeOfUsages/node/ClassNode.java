@@ -1,8 +1,8 @@
-package toolOfUsages.node;
+package treeOfUsages.node;
 
 import com.intellij.psi.NavigatablePsiElement;
 import com.intellij.psi.impl.source.PsiMethodImpl;
-import toolOfUsages.node.icon.HasIcon;
+import treeOfUsages.node.icon.HasIcon;
 
 public class ClassNode extends UsageNode
 {
