@@ -24,4 +24,15 @@ From this directory, run
 3. ...
 4. PROFIT!
 
+### Support
+* Standard instance method usages
+* Usages as method references
+* Static method usages
+* Method usages in static initialization blocks
+* Method usages in field initializations
+* Usages of immediate parents to method
+* Usages of immediate children to method
+
+Does not yet support usages of methods in declarative contexts, like SpEL and XML. No Lombok support.
+
 ### Feel free to provide feedback or report a bug

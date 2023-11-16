@@ -3,9 +3,8 @@ package treeOfUsages.node;
 import javax.swing.Icon;
 
 import com.intellij.psi.NavigatablePsiElement;
-import treeOfUsages.node.icon.HasIcon;
 
-public interface UsageNode extends HasIcon
+public interface UsageNode
 {
     NavigatablePsiElement getElement();
 

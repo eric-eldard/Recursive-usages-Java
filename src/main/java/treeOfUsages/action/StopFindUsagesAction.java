@@ -1,12 +1,11 @@
 package treeOfUsages.action;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import org.jetbrains.annotations.NotNull;
 import treeOfUsages.Plugin;
 
-public class StopFindUsagesAction extends AnAction
+public class StopFindUsagesAction extends EnableableAction
 {
     public Plugin mtw;
 
@@ -23,6 +22,13 @@ public class StopFindUsagesAction extends AnAction
         mtw = tw;
     }
 
+    @Override
+    public boolean isEnabled()
+    {
+        return enabled;
+    }
+
+    @Override
     public void setEnabled(boolean enabled)
     {
         this.enabled = enabled;

@@ -17,10 +17,11 @@ public class FindUsagesIncludingParentsAction extends FindUsagesAction
     {
         super(
             plugin,
-            "Build a Tree of Usages, including immediate parent methods",
-            "Build a tree of usages, including immediate parent methods",
-            AllIcons.RunConfigurations.TestState.Run_run,
-            true
+            "Build Tree of Usages (include immediate parent methods)",
+            "Build tree of usages (include immediate parent methods)",
+            AllIcons.General.ImplementingMethod,
+            true,
+            false
         );
     }
 }

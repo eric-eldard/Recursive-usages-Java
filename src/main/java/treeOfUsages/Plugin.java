@@ -2,6 +2,8 @@ package treeOfUsages;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -21,10 +23,13 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.treeStructure.Tree;
 import org.jetbrains.annotations.NotNull;
 import treeOfUsages.action.CollapseTreeAction;
+import treeOfUsages.action.EnableableAction;
 import treeOfUsages.action.ExpandTreeAction;
 import treeOfUsages.action.FindUsagesAction;
-import treeOfUsages.action.FindUsagesExcludingParentsAction;
+import treeOfUsages.action.FindDirectUsageAction;
+import treeOfUsages.action.FindUsagesIncludingChildrenAction;
 import treeOfUsages.action.FindUsagesIncludingParentsAction;
+import treeOfUsages.action.FindUsagesIncludingParentsAndChildrenAction;
 import treeOfUsages.action.StopFindUsagesAction;
 import treeOfUsages.util.TreeGenerator;
 
@@ -53,9 +58,14 @@ public class Plugin
     public boolean forcedCancel = false;
 
     // Actions
-    private final FindUsagesAction findUsagesExcludingParentsAction = new FindUsagesExcludingParentsAction(this);
+    private final FindUsagesAction findDirectUsagesAction = new FindDirectUsageAction(this);
 
     private final FindUsagesAction findUsagesIncludingParentsAction = new FindUsagesIncludingParentsAction(this);
+
+    private final FindUsagesAction findUsagesIncludingChildrenAction = new FindUsagesIncludingChildrenAction(this);
+
+    private final FindUsagesAction findUsagesIncludingParentsAndChildrenAction = 
+        new FindUsagesIncludingParentsAndChildrenAction(this);
 
     private final StopFindUsagesAction stopFindUsagesAction = new StopFindUsagesAction(this);
 
@@ -63,11 +73,21 @@ public class Plugin
 
     private final CollapseTreeAction collapseTreeAction = new CollapseTreeAction(this);
 
+    private final List<EnableableAction> allActions = new ArrayList<>();
+
 
     public Plugin(Project p)
     {
         project = p;
         generalPanel = new JPanel(new BorderLayout());
+
+        allActions.add(findDirectUsagesAction);
+        allActions.add(findUsagesIncludingParentsAction);
+        allActions.add(findUsagesIncludingChildrenAction);
+        allActions.add(findUsagesIncludingParentsAndChildrenAction);
+        allActions.add(stopFindUsagesAction);
+        allActions.add(expandTreeAction);
+        allActions.add(collapseTreeAction);
 
         JComponent toolbarPanel = createToolbarPanel();
         generalPanel.add(toolbarPanel, BorderLayout.NORTH);
@@ -86,26 +106,13 @@ public class Plugin
     {
         bottomPanel.removeAll();
 
-        if (isLoading)
-        {
-            bottomPanel.add(loadingPanel);
+        bottomPanel.add(isLoading ? loadingPanel : treeView);
 
-            findUsagesExcludingParentsAction.setEnabled(false);
-            findUsagesIncludingParentsAction.setEnabled(false);
-            stopFindUsagesAction.setEnabled(true);
-            expandTreeAction.setEnabled(false);
-            collapseTreeAction.setEnabled(false);
-        }
-        else
-        {
-            bottomPanel.add(treeView);
+        allActions.stream()
+            .filter(action -> action != stopFindUsagesAction)
+            .forEach(action -> action.setEnabled(!isLoading));
 
-            findUsagesExcludingParentsAction.setEnabled(true);
-            findUsagesIncludingParentsAction.setEnabled(true);
-            stopFindUsagesAction.setEnabled(false);
-            expandTreeAction.setEnabled(true);
-            collapseTreeAction.setEnabled(true);
-        }
+        stopFindUsagesAction.setEnabled(isLoading);
 
         ActivityTracker.getInstance().inc();
     }
@@ -115,22 +122,18 @@ public class Plugin
     {
         DefaultActionGroup result = new DefaultActionGroup();
 
-        result.add(findUsagesExcludingParentsAction);
-        result.add(findUsagesIncludingParentsAction);
-        result.add(stopFindUsagesAction);
-        result.add(expandTreeAction);
-        result.add(collapseTreeAction);
+        result.addAll(allActions);
 
         return ActionManager.getInstance()
             .createActionToolbar(ActionPlaces.STRUCTURE_VIEW_TOOLBAR, result, true)
             .getComponent();
     }
 
-    public void createAndRenderTree(PsiMethodImpl element, boolean includeSupers)
+    public void createAndRenderTree(PsiMethodImpl element, boolean includeSupers, boolean includeOverrides)
     {
         setLoading(true);
 
-        TreeGenerator treeGenerator = new TreeGenerator(this, project, element, includeSupers);
+        TreeGenerator treeGenerator = new TreeGenerator(this, project, element, includeSupers, includeOverrides);
 
         progressIndicator = new BackgroundableProcessIndicator(treeGenerator);
         ProgressManager.getInstance().runProcessWithProgressAsynchronously(treeGenerator, progressIndicator);

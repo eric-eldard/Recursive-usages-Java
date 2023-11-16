@@ -25,6 +25,7 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.impl.source.PsiMethodImpl;
 import com.intellij.psi.impl.source.tree.java.PsiMethodReferenceExpressionImpl;
 import com.intellij.psi.impl.source.tree.java.PsiReferenceExpressionImpl;
+import com.intellij.psi.search.searches.OverridingMethodsSearch;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.testIntegration.TestFinderHelper;
@@ -37,7 +38,6 @@ import treeOfUsages.TreeRenderer;
 import treeOfUsages.node.MethodNode;
 import treeOfUsages.node.HiddenNode;
 import treeOfUsages.node.UsageNode;
-import treeOfUsages.node.UsageNodeFactory;
 
 public class TreeGenerator extends Task.Backgroundable
 {
@@ -49,13 +49,17 @@ public class TreeGenerator extends Task.Backgroundable
 
     private final boolean includeSupers;
 
+    private final boolean includeOverrides;
+
     private ProgressIndicator indicator;
 
-    public TreeGenerator(Plugin plugin, @Nullable Project project, PsiMethodImpl e, boolean includeSupers)
+    public TreeGenerator(Plugin plugin, @Nullable Project project, PsiMethodImpl e, boolean includeSupers,
+        boolean includeOverrides)
     {
         super(project, "Generating Tree of Usages", false);
         this.plugin = plugin;
         this.includeSupers = includeSupers;
+        this.includeOverrides = includeOverrides;
         renderer = new TreeRenderer();
         element = e;
     }
@@ -100,19 +104,28 @@ public class TreeGenerator extends Task.Backgroundable
         DefaultMutableTreeNode methodNode = new DefaultMutableTreeNode(classNode);
         recursiveGenerator(methodNode);
 
-        PsiMethod[] superMethods = element.findSuperMethods();
-        List<DefaultMutableTreeNode> parents = new ArrayList<>();
+        List<PsiMethod> parentAndChildMethods = new ArrayList<>();
+        
         if (includeSupers)
         {
-            // include immediate parent/interface usages
-            Arrays.stream(superMethods)
-                .map(psiMethod -> UsageNodeFactory.createMethodNode(psiMethod, 1))
-                .map(usageNode -> recursiveGenerator(new DefaultMutableTreeNode(usageNode)))
-                .forEach(parents::add);
+            PsiMethod[] superMethods = element.findSuperMethods();
+            parentAndChildMethods.addAll(Arrays.asList(superMethods));
         }
         
+        if (includeOverrides)
+        {
+            Query<PsiMethod> shallowOverrides = OverridingMethodsSearch.search(element, false);
+            parentAndChildMethods.addAll(shallowOverrides.findAll());
+        }
+
+        // include immediate parent/interface and child usages
+        List<DefaultMutableTreeNode> parentAndChildNodes = parentAndChildMethods.stream()
+            .map(psiMethod -> UsageNodeFactory.createMethodNode(psiMethod, 1))
+            .map(usageNode -> recursiveGenerator(new DefaultMutableTreeNode(usageNode)))
+            .toList();
+        
         DefaultMutableTreeNode rootNode;
-        if (parents.isEmpty())
+        if (parentAndChildNodes.isEmpty())
         {
             rootNode = methodNode;
         }
@@ -120,7 +133,7 @@ public class TreeGenerator extends Task.Backgroundable
         {
             rootNode = new DefaultMutableTreeNode(new HiddenNode());
             rootNode.add(methodNode);
-            parents.forEach(rootNode::add);
+            parentAndChildNodes.forEach(rootNode::add);
         }
 
         return configureTree(rootNode);

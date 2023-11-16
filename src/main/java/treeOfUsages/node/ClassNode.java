@@ -3,17 +3,16 @@ package treeOfUsages.node;
 import javax.swing.Icon;
 
 import com.intellij.psi.NavigatablePsiElement;
-import treeOfUsages.node.icon.HasIcon;
 
 public class ClassNode implements UsageNode
 {
     private final NavigatablePsiElement element;
 
-    private final HasIcon iconContainer;
+    private final Icon icon;
 
-    public ClassNode(HasIcon iconContainer, NavigatablePsiElement element)
+    public ClassNode(Icon icon, NavigatablePsiElement element)
     {
-        this.iconContainer = iconContainer;
+        this.icon = icon;
         this.element = element;
     }
 
@@ -26,7 +25,7 @@ public class ClassNode implements UsageNode
     @Override
     public Icon getIcon()
     {
-        return iconContainer.getIcon();
+        return icon;
     }
 
     @Override

@@ -11,7 +11,6 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.search.searches.OverridingMethodsSearch;
 import com.intellij.ui.RowIcon;
 import com.intellij.util.Query;
-import treeOfUsages.node.icon.HasIcon;
 
 /**
  * An invocation of a method from a class
@@ -20,7 +19,7 @@ public class MethodNode implements UsageNode
 {
     private final PsiMethod method;
 
-    private final HasIcon iconContainer;
+    private final Icon icon;
 
     /**
      * This method will eventually call itself, appearing on the stack twice
@@ -32,9 +31,9 @@ public class MethodNode implements UsageNode
      */
     private final int count;
 
-    public MethodNode(HasIcon iconContainer, PsiMethod method, int count)
+    public MethodNode(Icon icon, PsiMethod method, int count)
     {
-        this.iconContainer = iconContainer;
+        this.icon = icon;
         this.method = method;
         this.count = count;
     }
@@ -60,7 +59,7 @@ public class MethodNode implements UsageNode
     {
         List<Icon> icons = new ArrayList<>();
 
-        icons.add(iconContainer.getIcon());
+        icons.add(icon);
 
         if (hasParent())
         {

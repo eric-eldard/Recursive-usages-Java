@@ -22,12 +22,14 @@
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id="Tree of Usages" icon="AllIcons.Actions.Refresh" anchor="right" factoryClass="treeOfUsages.PluginFactory"/>
+        <toolWindow id="Tree of Usages" icon="AllIcons.General.InheritedMethod" anchor="right" factoryClass="treeOfUsages.PluginFactory"/>
     </extensions>
 
     <actions>
-        <action id="findUsagesExcludingParentsAction" class="treeOfUsages.action.FindUsagesExcludingParentsAction" text="Build a Tree of Usages"/>
-        <action id="findUsagesIncludingParentsAction" class="treeOfUsages.action.FindUsagesIncludingParentsAction" text="Build a Tree of Usages, including immediate parent methods"/>
+        <action id="FindDirectUsageAction" class="treeOfUsages.action.FindDirectUsageAction" text="Build Tree of Usages"/>
+        <action id="findUsagesIncludingParentsAction" class="treeOfUsages.action.FindUsagesIncludingParentsAction" text="Build Tree of Usages (include immediate parent methods)"/>
+        <action id="findUsagesIncludingChildrenAction" class="treeOfUsages.action.FindUsagesIncludingChildrenAction" text="Build Tree of Usages (include immediate child methods)"/>
+        <action id="FindUsagesIncludingParentsAndChildrenAction" class="treeOfUsages.action.FindUsagesIncludingParentsAndChildrenAction" text="Build Tree of Usages (include immediate parent and child methods)"/>
         <action id="stopFindUsagesAction" class="treeOfUsages.action.StopFindUsagesAction" text="Stop Building a Tree of Usages"/>
         <action id="expandTreeAction" class="treeOfUsages.action.ExpandTreeAction" text="Expand All"/>
         <action id="collapseTreeAction" class="treeOfUsages.action.CollapseTreeAction" text="Collapse All"/>
