@@ -7,7 +7,7 @@ import treeOfUsages.Plugin;
 
 public class ExpandTreeAction extends EnableableAction
 {
-    public Plugin mtw;
+    public Plugin plugin;
 
     private boolean enabled = true;
 
@@ -16,10 +16,10 @@ public class ExpandTreeAction extends EnableableAction
     {
     }
 
-    public ExpandTreeAction(Plugin tw)
+    public ExpandTreeAction(Plugin plugin)
     {
         super("Expand All", "Expand all", AllIcons.Actions.Expandall);
-        mtw = tw;
+        this.plugin = plugin;
     }
 
     @Override
@@ -46,11 +46,11 @@ public class ExpandTreeAction extends EnableableAction
     @Override
     public void actionPerformed(@NotNull AnActionEvent e)
     {
-        if (mtw.tree != null)
+        if (plugin.getTree() != null)
         {
-            for (int i = 0; i < mtw.tree.getRowCount(); i++)
+            for (int i = 0; i < plugin.getTree().getRowCount(); i++)
             {
-                mtw.tree.expandRow(i);
+                plugin.getTree().expandRow(i);
             }
         }
     }

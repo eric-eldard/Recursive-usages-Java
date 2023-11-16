@@ -7,7 +7,7 @@ import treeOfUsages.Plugin;
 
 public class CollapseTreeAction extends EnableableAction
 {
-    public Plugin mtw;
+    public Plugin plugin;
 
     private boolean enabled = true;
 
@@ -16,10 +16,10 @@ public class CollapseTreeAction extends EnableableAction
     {
     }
 
-    public CollapseTreeAction(Plugin tw)
+    public CollapseTreeAction(Plugin plugin)
     {
         super("Collapse All", "Collapse all", AllIcons.Actions.Collapseall);
-        mtw = tw;
+        this.plugin = plugin;
     }
 
     @Override
@@ -46,11 +46,11 @@ public class CollapseTreeAction extends EnableableAction
     @Override
     public void actionPerformed(@NotNull AnActionEvent e)
     {
-        if (mtw.tree != null)
+        if (plugin.getTree() != null)
         {
-            for (int i = mtw.tree.getRowCount() - 1; i >= 0; i--)
+            for (int i = plugin.getTree().getRowCount() - 1; i >= 0; i--)
             {
-                mtw.tree.collapseRow(i);
+                plugin.getTree().collapseRow(i);
             }
         }
     }

@@ -49,7 +49,7 @@ public class Plugin
 
     private final Project project;
 
-    public Tree tree;
+    private Tree tree;
 
     private JBScrollPane treeView;
 
@@ -158,5 +158,10 @@ public class Plugin
     public JPanel getContent()
     {
         return generalPanel;
+    }
+
+    public Tree getTree()
+    {
+        return tree;
     }
 }

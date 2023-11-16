@@ -254,7 +254,7 @@ public class TreeGenerator extends Task.Backgroundable
         Tree tree = new Tree(top);
 
         tree.setCellRenderer(renderer);
-        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
+        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         tree.addTreeSelectionListener(treeSelectionEvent ->
         {
             TreePath tp = treeSelectionEvent.getPath();
