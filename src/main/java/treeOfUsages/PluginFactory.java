@@ -12,7 +12,7 @@ public class PluginFactory implements ToolWindowFactory
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow)
     {
         Plugin plugin = new Plugin(project);
-        ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
+        ContentFactory contentFactory = ContentFactory.getInstance();
         Content content = contentFactory.createContent(plugin.getContent(), "", false);
         toolWindow.getContentManager().addContent(content);
     }

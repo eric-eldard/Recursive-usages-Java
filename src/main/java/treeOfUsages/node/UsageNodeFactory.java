@@ -1,23 +1,23 @@
 package treeOfUsages.node;
 
-import com.intellij.psi.impl.source.PsiMethodImpl;
-import com.intellij.psi.impl.source.tree.java.PsiMethodReferenceExpressionImpl;
+import com.intellij.psi.NavigatablePsiElement;
+import com.intellij.psi.PsiMethod;
 import com.intellij.testIntegration.TestFinderHelper;
+import treeOfUsages.node.icon.HasIcon;
+import treeOfUsages.node.icon.file.JavaFileIcon;
 import treeOfUsages.node.icon.method.MethodIcon;
 import treeOfUsages.node.icon.method.TestIcon;
-import treeOfUsages.node.icon.file.JavaFileIcon;
-import treeOfUsages.node.icon.HasIcon;
 
 public class UsageNodeFactory
 {
-    public static UsageNode createFileNode(PsiMethodReferenceExpressionImpl ref)
+    public static UsageNode createFileNode(NavigatablePsiElement ref)
     {
-        return new FileNode(new JavaFileIcon(), ref);
+        return new ClassNode(new JavaFileIcon(), ref);
     }
 
-    public static UsageNode createMethodNode(PsiMethodImpl method, int count)
+    public static UsageNode createMethodNode(PsiMethod method, int count)
     {
         HasIcon icon = TestFinderHelper.isTest(method) ? new TestIcon() : new MethodIcon();
-        return new ClassNode(icon, method, count);
+        return new MethodNode(icon, method, count);
     }
 }

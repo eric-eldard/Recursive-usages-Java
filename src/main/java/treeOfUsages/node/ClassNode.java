@@ -1,23 +1,20 @@
 package treeOfUsages.node;
 
+import javax.swing.Icon;
+
 import com.intellij.psi.NavigatablePsiElement;
-import com.intellij.psi.impl.source.PsiMethodImpl;
 import treeOfUsages.node.icon.HasIcon;
 
-public class ClassNode extends UsageNode
+public class ClassNode implements UsageNode
 {
-    private final PsiMethodImpl element;
+    private final NavigatablePsiElement element;
 
-    /**
-     * The number of times the parent is invoked directly from this node
-     */
-    private final int count;
+    private final HasIcon iconContainer;
 
-    public ClassNode(HasIcon iconContainer, PsiMethodImpl element, int count)
+    public ClassNode(HasIcon iconContainer, NavigatablePsiElement element)
     {
-        super(iconContainer);
+        this.iconContainer = iconContainer;
         this.element = element;
-        this.count = count;
     }
 
     @Override
@@ -27,22 +24,20 @@ public class ClassNode extends UsageNode
     }
 
     @Override
+    public Icon getIcon()
+    {
+        return iconContainer.getIcon();
+    }
+
+    @Override
     public String getMainText()
     {
-        return getElement().getName();
+        return getElement().getContainingFile().getName();
     }
 
     @Override
     public String getAdditionalText()
     {
-        return " ← " + getElement().getOriginalElement().getContainingFile().getName() + makeMultiplicityLabel();
-    }
-
-    /**
-     * @return a multiplicity label for counts greater than 1: " (x2)"
-     */
-    private String makeMultiplicityLabel()
-    {
-        return count > 1 ? String.format(" (x%d)", count) : "";
+        return "";
     }
 }

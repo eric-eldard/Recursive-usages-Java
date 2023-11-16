@@ -1,6 +1,7 @@
 package treeOfUsages.action;
 
-import com.intellij.icons.AllIcons;
+import javax.swing.Icon;
+
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -19,19 +20,22 @@ import treeOfUsages.Plugin;
 
 public class FindUsagesAction extends AnAction
 {
-    public Plugin mtw;
+    public Plugin plugin;
 
     private boolean enabled = true;
+
+    private boolean includeParent;
 
     @SuppressWarnings("unused")
     public FindUsagesAction()
     {
     }
 
-    public FindUsagesAction(Plugin tw)
+    public FindUsagesAction(Plugin plugin, String text, String description, Icon icon, boolean includeParent)
     {
-        super("Build a Tree of Usages", "Build a tree of usages", AllIcons.RunConfigurations.TestState.Run);
-        mtw = tw;
+        super(text, description, icon);
+        this.plugin = plugin;
+        this.includeParent = includeParent;
     }
 
     public void setEnabled(boolean enabled)
@@ -71,7 +75,7 @@ public class FindUsagesAction extends AnAction
                         PsiTreeUtil.findElementOfClassAtOffset(file, offset, PsiMethodImpl.class, false);
                     if (mel != null)
                     {
-                        mtw.createAndRenderTree(mel);
+                        plugin.createAndRenderTree(mel, includeParent);
                     }
                 }
             }

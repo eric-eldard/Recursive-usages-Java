@@ -14,20 +14,27 @@ public class TreeRenderer extends NodeRenderer
     public void customizeCellRenderer(@NotNull JTree tree, Object value, boolean selected, boolean expanded,
         boolean leaf, int row, boolean hasFocus)
     {
-        final DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) value;
+        DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) value;
         UsageNode node = (UsageNode) treeNode.getUserObject();
         if (node != null)
         {
-            setIcon(node.getIcon());
-
-            try
+            if (node.isHidden() && treeNode.getParent() == null)
             {
-                append(node.getMainText(), SimpleTextAttributes.REGULAR_ATTRIBUTES, true);
-                append(node.getAdditionalText(), SimpleTextAttributes.GRAYED_ATTRIBUTES, false);
+                tree.setRootVisible(false);
             }
-            catch (Exception e)
+            else
             {
-                append("Error", SimpleTextAttributes.ERROR_ATTRIBUTES);
+                setIcon(node.getIcon());
+
+                try
+                {
+                    append(node.getMainText(), SimpleTextAttributes.REGULAR_ATTRIBUTES, true);
+                    append(node.getAdditionalText(), SimpleTextAttributes.GRAYED_ATTRIBUTES, false);
+                }
+                catch (Exception e)
+                {
+                    append("Error", SimpleTextAttributes.ERROR_ATTRIBUTES);
+                }
             }
         }
     }

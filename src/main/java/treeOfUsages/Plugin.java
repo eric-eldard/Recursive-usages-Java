@@ -23,6 +23,8 @@ import org.jetbrains.annotations.NotNull;
 import treeOfUsages.action.CollapseTreeAction;
 import treeOfUsages.action.ExpandTreeAction;
 import treeOfUsages.action.FindUsagesAction;
+import treeOfUsages.action.FindUsagesExcludingParentsAction;
+import treeOfUsages.action.FindUsagesIncludingParentsAction;
 import treeOfUsages.action.StopFindUsagesAction;
 import treeOfUsages.util.TreeGenerator;
 
@@ -51,7 +53,9 @@ public class Plugin
     public boolean forcedCancel = false;
 
     // Actions
-    private final FindUsagesAction findUsagesAction = new FindUsagesAction(this);
+    private final FindUsagesAction findUsagesExcludingParentsAction = new FindUsagesExcludingParentsAction(this);
+
+    private final FindUsagesAction findUsagesIncludingParentsAction = new FindUsagesIncludingParentsAction(this);
 
     private final StopFindUsagesAction stopFindUsagesAction = new StopFindUsagesAction(this);
 
@@ -86,7 +90,8 @@ public class Plugin
         {
             bottomPanel.add(loadingPanel);
 
-            findUsagesAction.setEnabled(false);
+            findUsagesExcludingParentsAction.setEnabled(false);
+            findUsagesIncludingParentsAction.setEnabled(false);
             stopFindUsagesAction.setEnabled(true);
             expandTreeAction.setEnabled(false);
             collapseTreeAction.setEnabled(false);
@@ -95,7 +100,8 @@ public class Plugin
         {
             bottomPanel.add(treeView);
 
-            findUsagesAction.setEnabled(true);
+            findUsagesExcludingParentsAction.setEnabled(true);
+            findUsagesIncludingParentsAction.setEnabled(true);
             stopFindUsagesAction.setEnabled(false);
             expandTreeAction.setEnabled(true);
             collapseTreeAction.setEnabled(true);
@@ -109,7 +115,8 @@ public class Plugin
     {
         DefaultActionGroup result = new DefaultActionGroup();
 
-        result.add(findUsagesAction);
+        result.add(findUsagesExcludingParentsAction);
+        result.add(findUsagesIncludingParentsAction);
         result.add(stopFindUsagesAction);
         result.add(expandTreeAction);
         result.add(collapseTreeAction);
@@ -119,11 +126,11 @@ public class Plugin
             .getComponent();
     }
 
-    public void createAndRenderTree(PsiMethodImpl element)
+    public void createAndRenderTree(PsiMethodImpl element, boolean includeSupers)
     {
         setLoading(true);
 
-        TreeGenerator treeGenerator = new TreeGenerator(this, project, element);
+        TreeGenerator treeGenerator = new TreeGenerator(this, project, element, includeSupers);
 
         progressIndicator = new BackgroundableProcessIndicator(treeGenerator);
         ProgressManager.getInstance().runProcessWithProgressAsynchronously(treeGenerator, progressIndicator);

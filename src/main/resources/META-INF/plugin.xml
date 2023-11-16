@@ -26,9 +26,10 @@
     </extensions>
 
     <actions>
-        <action id="treeOfUsages.action.FindUsagesAction" class="treeOfUsages.action.FindUsagesAction" text="Build a Tree of Usages"/>
-        <action id="treeOfUsages.action.StopFindUsagesAction" class="treeOfUsages.action.StopFindUsagesAction" text="Stop Building a Tree of Usages"/>
-        <action id="treeOfUsages.action.ExpandTreeAction" class="treeOfUsages.action.ExpandTreeAction" text="Expand All"/>
-        <action id="treeOfUsages.action.CollapseTreeAction" class="treeOfUsages.action.CollapseTreeAction" text="Collapse All"/>
+        <action id="findUsagesExcludingParentsAction" class="treeOfUsages.action.FindUsagesExcludingParentsAction" text="Build a Tree of Usages"/>
+        <action id="findUsagesIncludingParentsAction" class="treeOfUsages.action.FindUsagesIncludingParentsAction" text="Build a Tree of Usages, including immediate parent methods"/>
+        <action id="stopFindUsagesAction" class="treeOfUsages.action.StopFindUsagesAction" text="Stop Building a Tree of Usages"/>
+        <action id="expandTreeAction" class="treeOfUsages.action.ExpandTreeAction" text="Expand All"/>
+        <action id="collapseTreeAction" class="treeOfUsages.action.CollapseTreeAction" text="Collapse All"/>
     </actions>
 </idea-plugin>
