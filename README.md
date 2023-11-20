@@ -14,7 +14,7 @@ From this directory, run
 ![Install From Disk](img/install-from-disk.png)
 1. Navigate to Settings > Plugins
 2. Choose "Install Plugin from Disk..."
-3. Select `Recursive-usages-Java/build/distributions/Recursive-usages-Java-1.3-Java.zip`
+3. Select `Recursive-usages-Java/build/distributions/Recursive-usages-Java-2.0.zip`
 4. Restart IntelliJ and wait for indexing to complete
 
 ### To Use
@@ -30,8 +30,8 @@ From this directory, run
 * Static method usages
 * Method usages in static initialization blocks
 * Method usages in field initializations
-* Usages of immediate parents to method
-* Usages of immediate children to method
+* Usages of immediate parents of method
+* Usages of immediate children of method
 
 Does not yet support usages of methods in declarative contexts, like SpEL and XML. No Lombok support.
 
