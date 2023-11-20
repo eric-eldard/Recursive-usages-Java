@@ -4,6 +4,7 @@ plugins {
 
 group = "org.endpointdeps"
 version = pluginVersion
+buildSearchableOptions.enabled = false
 
 repositories {
     mavenCentral()
