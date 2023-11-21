@@ -20,7 +20,7 @@ From this directory, run
 ### To Use
 ![Plugin in Action](img/plugin-in-action.png)
 1. Select a method
-2. Click green play button
+2. Click method button
 3. ...
 4. PROFIT!
 
