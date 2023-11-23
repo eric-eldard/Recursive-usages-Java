@@ -18,8 +18,8 @@ public class FindUsagesIncludingParentsAndChildrenAction extends FindUsagesActio
     {
         super(
             plugin,
-            "Build Tree of Usages (include immediate parent and child methods)",
-            "Build tree of usages (include immediate parent and child methods)",
+            "Build Tree (include immediate parent and child methods)",
+            "Build a tree of usages which includes both immediate parent and child methods",
             AllIcons.Gutter.SiblingInheritedMethod,
             true,
             true

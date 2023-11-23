@@ -9,8 +9,6 @@ public class CollapseTreeAction extends EnableableAction
 {
     public Plugin plugin;
 
-    private boolean enabled = true;
-
     @SuppressWarnings("unused")
     public CollapseTreeAction()
     {
@@ -18,29 +16,12 @@ public class CollapseTreeAction extends EnableableAction
 
     public CollapseTreeAction(Plugin plugin)
     {
-        super("Collapse All", "Collapse all", AllIcons.Actions.Collapseall);
+        super(
+            "Collapse All",
+            "Collapse all nodes in the current tree",
+            AllIcons.Actions.Collapseall
+        );
         this.plugin = plugin;
-    }
-
-    @Override
-    public boolean isEnabled()
-    {
-        return enabled;
-    }
-
-    @Override
-    public void setEnabled(boolean enabled)
-    {
-        this.enabled = enabled;
-    }
-
-    @Override
-    public void update(
-        @NotNull
-        AnActionEvent e)
-    {
-        e.getPresentation().setEnabled(enabled);
-        super.update(e);
     }
 
     @Override

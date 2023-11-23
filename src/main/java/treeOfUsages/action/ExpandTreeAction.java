@@ -9,8 +9,6 @@ public class ExpandTreeAction extends EnableableAction
 {
     public Plugin plugin;
 
-    private boolean enabled = true;
-
     @SuppressWarnings("unused")
     public ExpandTreeAction()
     {
@@ -18,29 +16,12 @@ public class ExpandTreeAction extends EnableableAction
 
     public ExpandTreeAction(Plugin plugin)
     {
-        super("Expand All", "Expand all", AllIcons.Actions.Expandall);
+        super(
+            "Expand All",
+            "Expand all nodes in the current tree",
+            AllIcons.Actions.Expandall
+        );
         this.plugin = plugin;
-    }
-
-    @Override
-    public boolean isEnabled()
-    {
-        return enabled;
-    }
-
-    @Override
-    public void setEnabled(boolean enabled)
-    {
-        this.enabled = enabled;
-    }
-
-    @Override
-    public void update(
-        @NotNull
-        AnActionEvent e)
-    {
-        e.getPresentation().setEnabled(enabled);
-        super.update(e);
     }
 
     @Override
@@ -53,5 +34,11 @@ public class ExpandTreeAction extends EnableableAction
                 plugin.getTree().expandRow(i);
             }
         }
+    }
+
+    @Override
+    public boolean isFirstInGroup()
+    {
+        return true;
     }
 }

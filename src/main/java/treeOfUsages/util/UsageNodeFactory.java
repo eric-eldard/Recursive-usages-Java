@@ -18,11 +18,11 @@ public class UsageNodeFactory
         return new ClassNode(PlatformIcons.CLASS_ICON, ref);
     }
 
-    public static UsageNode createMethodNode(PsiMethod method, int count)
+    public static UsageNode createMethodNode(PsiMethod method, int depth, int count)
     {
         Icon icon = TestFinderHelper.isTest(method) ?
             AllIcons.Actions.StartDebugger : 
             AllIcons.Nodes.Method;
-        return new MethodNode(icon, method, count);
+        return new MethodNode(icon, method, depth, count);
     }
 }

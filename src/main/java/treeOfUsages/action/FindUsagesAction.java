@@ -24,8 +24,6 @@ public class FindUsagesAction extends EnableableAction
 {
     public Plugin plugin;
 
-    private boolean enabled = true;
-
     private boolean includeParents;
 
     private boolean includeChildren;
@@ -45,25 +43,6 @@ public class FindUsagesAction extends EnableableAction
     }
 
     @Override
-    public boolean isEnabled()
-    {
-        return enabled;
-    }
-
-    @Override
-    public void setEnabled(boolean enabled)
-    {
-        this.enabled = enabled;
-    }
-
-    @Override
-    public void update(@NotNull AnActionEvent e)
-    {
-        e.getPresentation().setEnabled(enabled);
-        super.update(e);
-    }
-
-    @Override
     public void actionPerformed(@NotNull AnActionEvent e)
     {
         // If the plugin is in focus and has a method selected, we'll follow that method.
@@ -74,6 +53,18 @@ public class FindUsagesAction extends EnableableAction
         if (method == null)
         {
             method = getMethodFromEditor(e.getData(CommonDataKeys.EDITOR));
+            
+            if (method != null)
+            {
+                // Selecting a new method from the editor potentially creates a discontiguous history
+                plugin.resetHistory();
+            }
+        }
+        else
+        {
+            // When we render a new tree, the trees in history behind this one remain valid, but the trees ahead of this
+            // one must be dropped since they may no longer be contiguous with the new tree.
+            plugin.clearHistoryAhead();
         }
 
         // Render tree for the selected method

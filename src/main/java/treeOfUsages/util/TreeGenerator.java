@@ -3,7 +3,9 @@ package treeOfUsages.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
@@ -32,18 +34,19 @@ import com.intellij.testIntegration.TestFinderHelper;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.Query;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import treeOfUsages.Plugin;
 import treeOfUsages.TreeRenderer;
-import treeOfUsages.node.MethodNode;
 import treeOfUsages.node.HiddenNode;
+import treeOfUsages.node.MethodNode;
 import treeOfUsages.node.UsageNode;
 
 public class TreeGenerator extends Task.Backgroundable
 {
-    private final TreeRenderer renderer;
+    private final TreeRenderer renderer = new TreeRenderer();
 
-    private final PsiMethodImpl element;
+    private final Map<PsiMethod, MethodNode> uniqueNodes = new HashMap<>();
+
+    private final PsiMethodImpl method;
 
     private final Plugin plugin;
 
@@ -53,15 +56,14 @@ public class TreeGenerator extends Task.Backgroundable
 
     private ProgressIndicator indicator;
 
-    public TreeGenerator(Plugin plugin, @Nullable Project project, PsiMethodImpl e, boolean includeSupers,
+    public TreeGenerator(Plugin plugin, Project project, PsiMethodImpl method, boolean includeSupers, 
         boolean includeOverrides)
     {
-        super(project, "Generating Tree of Usages", false);
+        super(project, "Generating tree of usages", false);
         this.plugin = plugin;
         this.includeSupers = includeSupers;
         this.includeOverrides = includeOverrides;
-        renderer = new TreeRenderer();
-        element = e;
+        this.method = method;
     }
 
     public void run(@NotNull ProgressIndicator progressIndicator)
@@ -81,17 +83,13 @@ public class TreeGenerator extends Task.Backgroundable
     {
         try
         {
-            Tree tree = generateUsageTree(element);
+            Tree tree = generateUsageTree(method);
 
             plugin.finishCreatingTree(tree);
         }
         catch (ProcessCanceledException e)
         {
-            if (plugin.forcedCancel)
-            {
-                plugin.forcedCancel = false;
-            }
-            else
+            if (!plugin.userCanceled())
             {
                 throw e;
             }
@@ -100,7 +98,7 @@ public class TreeGenerator extends Task.Backgroundable
 
     private Tree generateUsageTree(PsiMethodImpl element) throws ProcessCanceledException
     {
-        MethodNode classNode = (MethodNode) UsageNodeFactory.createMethodNode(element, 1);
+        MethodNode classNode = (MethodNode) UsageNodeFactory.createMethodNode(element, 0, 1);
         DefaultMutableTreeNode methodNode = new DefaultMutableTreeNode(classNode);
         recursiveGenerator(methodNode);
 
@@ -120,14 +118,14 @@ public class TreeGenerator extends Task.Backgroundable
 
         // include immediate parent/interface and child usages
         List<DefaultMutableTreeNode> parentAndChildNodes = parentAndChildMethods.stream()
-            .map(psiMethod -> UsageNodeFactory.createMethodNode(psiMethod, 1))
+            .map(psiMethod -> UsageNodeFactory.createMethodNode(psiMethod, 0, 1))
             .map(usageNode -> recursiveGenerator(new DefaultMutableTreeNode(usageNode)))
             .toList();
         
         DefaultMutableTreeNode rootNode;
         if (parentAndChildNodes.isEmpty())
         {
-            rootNode = methodNode;
+            rootNode = methodNode; // no siblings, so no need for an invisible root node
         }
         else
         {
@@ -149,7 +147,7 @@ public class TreeGenerator extends Task.Backgroundable
             .<NavigatablePsiElement, Boolean>comparing(TestFinderHelper::isTest) // sort tests to bottom
             .thenComparing(element -> element.getContainingFile().getName())     // then sort by containing file
             .thenComparing(NavigatablePsiElement::getName,                       // then sort by method name
-                Comparator.nullsFirst(Comparator.naturalOrder()))                // uses outside methods have null name
+                Comparator.nullsFirst(Comparator.naturalOrder()))                // non-methods usages have null name
             .thenComparingInt(NavigatablePsiElement::hashCode) // distinguish between overloads of same method
         );
 
@@ -184,14 +182,19 @@ public class TreeGenerator extends Task.Backgroundable
 
     private void processMethodUsage(DefaultMutableTreeNode parentNode, PsiMethodImpl methodImpl, int occurrences)
     {
-        MethodNode callingMethod = (MethodNode) UsageNodeFactory.createMethodNode(methodImpl, occurrences);
-        DefaultMutableTreeNode callingNode = new DefaultMutableTreeNode(callingMethod);
+        MethodNode callingMethod = (MethodNode) UsageNodeFactory.createMethodNode(
+            methodImpl,
+            ((MethodNode) parentNode.getUserObject()).getDepth() + 1,
+            occurrences
+        );
+        flagDuplicateMethodNodes(callingMethod);
 
+        DefaultMutableTreeNode callingNode = new DefaultMutableTreeNode(callingMethod);
         parentNode.add(callingNode);
 
         // Detect cyclical ancestors (null parent signals you've reached the root node)
         DefaultMutableTreeNode identicalAncestorNode = parentNode;
-        while (identicalAncestorNode != null && !sameNode(callingNode, identicalAncestorNode))
+        while (identicalAncestorNode != null && !sameTreeNode(callingNode, identicalAncestorNode))
         {
             identicalAncestorNode = (DefaultMutableTreeNode) identicalAncestorNode.getParent();
         }
@@ -204,15 +207,40 @@ public class TreeGenerator extends Task.Backgroundable
         else
         {
             // stop recursing and mark as cyclic
-            callingMethod.setCyclic(true);
+            callingMethod.markCyclic();
         }
     }
 
-    private boolean sameNode(@NotNull DefaultMutableTreeNode nodeA, @NotNull DefaultMutableTreeNode nodeB)
+    private boolean sameTreeNode(DefaultMutableTreeNode nodeA, DefaultMutableTreeNode nodeB)
     {
         NavigatablePsiElement elementA = ((UsageNode) nodeA.getUserObject()).getElement();
         NavigatablePsiElement elementB = ((UsageNode) nodeB.getUserObject()).getElement();
         return elementA.equals(elementB);
+    }
+
+    private void flagDuplicateMethodNodes(MethodNode node)
+    {
+        PsiMethod method = ((PsiMethod) node.getElement());
+        MethodNode previouslySeenNode = uniqueNodes.get(method);
+        
+        if (previouslySeenNode != null)
+        {
+            if (node.getDepth() < previouslySeenNode.getDepth())
+            {
+                // New node is higher in the hierarchy; set it as the "original" and he previous node as the duplicate
+                uniqueNodes.put(method, node);
+                previouslySeenNode.markDuplicateNode();
+            }
+            else
+            {
+                // New node is lower in the hierarchy; treat it as the duplicate
+                node.markDuplicateNode();
+            }
+        }
+        else
+        {
+            uniqueNodes.put(method, node);
+        }
     }
 
     /**

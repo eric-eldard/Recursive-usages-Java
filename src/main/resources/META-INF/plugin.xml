@@ -2,7 +2,7 @@
     <id>org.endpointdeps.Recursive-usages-Java</id>
     <name>Tree of Usages - Java</name>
     <vendor>Timur Mukhatov, Eric Eldard</vendor>
-    <version>2.0</version>
+    <version><![CDATA[ Replaced by gradle.properties pluginVersion]]></version>
 
     <idea-version since-build="232.2"/>
 

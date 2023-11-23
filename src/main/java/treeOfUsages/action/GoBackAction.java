@@ -5,21 +5,21 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import org.jetbrains.annotations.NotNull;
 import treeOfUsages.Plugin;
 
-public class StopFindUsagesAction extends EnableableAction
+public class GoBackAction extends EnableableAction
 {
     public Plugin plugin;
 
     @SuppressWarnings("unused")
-    public StopFindUsagesAction()
+    public GoBackAction()
     {
     }
 
-    public StopFindUsagesAction(Plugin plugin)
+    public GoBackAction(Plugin plugin)
     {
         super(
-            "Stop Building Tree",
-            "Immediately terminate building of the current tree of usages",
-            AllIcons.Actions.Suspend
+            "Back to Previous Tree",
+            "Go back to the previous tree in the history",
+            AllIcons.Actions.Back
         );
         this.plugin = plugin;
     }
@@ -27,12 +27,6 @@ public class StopFindUsagesAction extends EnableableAction
     @Override
     public void actionPerformed(@NotNull AnActionEvent e)
     {
-        plugin.stop();
-    }
-
-    @Override
-    public boolean isFirstInGroup()
-    {
-        return true;
+        plugin.goBack();
     }
 }

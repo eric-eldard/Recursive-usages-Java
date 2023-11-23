@@ -22,19 +22,30 @@ public class MethodNode implements UsageNode
     private final Icon icon;
 
     /**
-     * This method will eventually call itself, appearing on the stack twice
+     * The distance down a given branch this node was found
      */
-    private boolean cyclic;
+    private final int depth;
 
     /**
      * The number of times the parent is invoked directly from this node
      */
     private final int count;
 
-    public MethodNode(Icon icon, PsiMethod method, int count)
+    /**
+     * This method will eventually call itself, appearing on the stack twice
+     */
+    private boolean cyclic;
+
+    /**
+     * This node matched one already found in an earlier branch of the tree
+     */
+    private boolean duplicateNode;
+
+    public MethodNode(Icon icon, PsiMethod method, int depth, int count)
     {
         this.icon = icon;
         this.method = method;
+        this.depth = depth;
         this.count = count;
     }
 
@@ -44,14 +55,19 @@ public class MethodNode implements UsageNode
         return this.method;
     }
 
-    public boolean isCyclic()
+    public void markCyclic()
     {
-        return isCyclic();
+        cyclic = true;
     }
 
-    public void setCyclic(boolean cyclic)
+    public void markDuplicateNode()
     {
-        this.cyclic = cyclic;
+        duplicateNode = true;
+    }
+
+    public int getDepth()
+    {
+        return depth;
     }
 
     @Override
@@ -59,16 +75,26 @@ public class MethodNode implements UsageNode
     {
         List<Icon> icons = new ArrayList<>();
 
-        icons.add(icon);
-
-        if (hasParent())
+        if (duplicateNode)
         {
-            icons.add(AllIcons.Gutter.ImplementingMethod);
+            icons.add(AllIcons.Nodes.MultipleTypeDefinitions);
         }
-
-        if (hasChild())
+        else
         {
-            icons.add(AllIcons.Gutter.OverridenMethod);
+            icons.add(icon);
+
+            if (hasParent() && hasChild())
+            {
+                icons.add(AllIcons.Gutter.SiblingInheritedMethod);
+            }
+            else if (hasParent())
+            {
+                icons.add(AllIcons.Gutter.ImplementingMethod);
+            }
+            else if (hasChild())
+            {
+                icons.add(AllIcons.Gutter.OverridenMethod);
+            }
         }
 
         if (cyclic)

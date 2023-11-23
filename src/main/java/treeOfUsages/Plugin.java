@@ -4,14 +4,16 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
+import java.util.stream.Stream;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-import com.intellij.ide.ActivityTracker;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
+import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.impl.BackgroundableProcessIndicator;
@@ -21,24 +23,19 @@ import com.intellij.psi.impl.source.PsiMethodImpl;
 import com.intellij.ui.components.JBLoadingPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.treeStructure.Tree;
-import org.jetbrains.annotations.NotNull;
 import treeOfUsages.action.CollapseTreeAction;
 import treeOfUsages.action.EnableableAction;
 import treeOfUsages.action.ExpandTreeAction;
-import treeOfUsages.action.FindUsagesAction;
 import treeOfUsages.action.FindDirectUsageAction;
 import treeOfUsages.action.FindUsagesIncludingChildrenAction;
 import treeOfUsages.action.FindUsagesIncludingParentsAction;
 import treeOfUsages.action.FindUsagesIncludingParentsAndChildrenAction;
+import treeOfUsages.action.GoBackAction;
+import treeOfUsages.action.GoForwardAction;
+import treeOfUsages.action.ResetAction;
 import treeOfUsages.action.StopFindUsagesAction;
 import treeOfUsages.util.TreeGenerator;
 
-/**
- * Note that this warning may be logged when debugging and that it has no impact on IntelliJ or the plugin:
- * <a href="https://github.com/JetBrains/gradle-intellij-plugin/issues/777">
- *     Please call toolbar.setTargetComponent() explicitly
- * </a>
- */
 public class Plugin
 {
     private final JPanel generalPanel;
@@ -55,39 +52,47 @@ public class Plugin
 
     private BackgroundableProcessIndicator progressIndicator;
 
-    public boolean forcedCancel = false;
+    private boolean userCanceled = false;
 
-    // Actions
-    private final FindUsagesAction findDirectUsagesAction = new FindDirectUsageAction(this);
+    private final EnableableAction stopFindUsagesAction = new StopFindUsagesAction(this);
 
-    private final FindUsagesAction findUsagesIncludingParentsAction = new FindUsagesIncludingParentsAction(this);
+    private final EnableableAction goBackAction = new GoBackAction(this);
 
-    private final FindUsagesAction findUsagesIncludingChildrenAction = new FindUsagesIncludingChildrenAction(this);
+    private final EnableableAction goForwardAction = new GoForwardAction(this);
 
-    private final FindUsagesAction findUsagesIncludingParentsAndChildrenAction = 
-        new FindUsagesIncludingParentsAndChildrenAction(this);
+    private final EnableableAction resetAction = new ResetAction(this);
 
-    private final StopFindUsagesAction stopFindUsagesAction = new StopFindUsagesAction(this);
+    private final EnableableAction expandAction = new ExpandTreeAction(this);
 
-    private final ExpandTreeAction expandTreeAction = new ExpandTreeAction(this);
+    private final EnableableAction collapseAction = new CollapseTreeAction(this);
 
-    private final CollapseTreeAction collapseTreeAction = new CollapseTreeAction(this);
+    private final List<EnableableAction> generateActions = new ArrayList<>();
 
-    private final List<EnableableAction> allActions = new ArrayList<>();
+    private final List<EnableableAction> postGenerateActions = new ArrayList<>();
+
+    private final Stack<HistoryFrame> historyBehind = new Stack<>();
+
+    private final Stack<HistoryFrame> historyAhead = new Stack<>();
+
+    private HistoryFrame currentFrame;
 
 
-    public Plugin(Project p)
+    public Plugin(Project project)
     {
-        project = p;
+        this.project = project;
         generalPanel = new JPanel(new BorderLayout());
 
-        allActions.add(findDirectUsagesAction);
-        allActions.add(findUsagesIncludingParentsAction);
-        allActions.add(findUsagesIncludingChildrenAction);
-        allActions.add(findUsagesIncludingParentsAndChildrenAction);
-        allActions.add(stopFindUsagesAction);
-        allActions.add(expandTreeAction);
-        allActions.add(collapseTreeAction);
+        generateActions.add(new FindDirectUsageAction(this));
+        generateActions.add(new FindUsagesIncludingParentsAction(this));
+        generateActions.add(new FindUsagesIncludingChildrenAction(this));
+        generateActions.add(new FindUsagesIncludingParentsAndChildrenAction(this));
+
+        postGenerateActions.add(stopFindUsagesAction);
+        postGenerateActions.add(goBackAction);
+        postGenerateActions.add(goForwardAction);
+        postGenerateActions.add(resetAction);
+        postGenerateActions.add(expandAction);
+        postGenerateActions.add(collapseAction);
 
         JComponent toolbarPanel = createToolbarPanel();
         generalPanel.add(toolbarPanel, BorderLayout.NORTH);
@@ -100,59 +105,92 @@ public class Plugin
         Disposable animationDisposable = Disposer.newDisposable();
         loadingPanel = new JBLoadingPanel(new FlowLayout(), animationDisposable);
         loadingPanel.startLoading();
+        
+        setRunning(false, false);
     }
 
-    private void setLoading(boolean isLoading)
+    public void createAndRenderTree(PsiMethodImpl method, boolean includeSupers, boolean includeOverrides)
     {
-        bottomPanel.removeAll();
-
-        bottomPanel.add(isLoading ? loadingPanel : treeView);
-
-        allActions.stream()
-            .filter(action -> action != stopFindUsagesAction)
-            .forEach(action -> action.setEnabled(!isLoading));
-
-        stopFindUsagesAction.setEnabled(isLoading);
-
-        ActivityTracker.getInstance().inc();
-    }
-
-    @NotNull
-    private JComponent createToolbarPanel()
-    {
-        DefaultActionGroup result = new DefaultActionGroup();
-
-        result.addAll(allActions);
-
-        return ActionManager.getInstance()
-            .createActionToolbar(ActionPlaces.STRUCTURE_VIEW_TOOLBAR, result, true)
-            .getComponent();
-    }
-
-    public void createAndRenderTree(PsiMethodImpl element, boolean includeSupers, boolean includeOverrides)
-    {
-        setLoading(true);
-
-        TreeGenerator treeGenerator = new TreeGenerator(this, project, element, includeSupers, includeOverrides);
-
-        progressIndicator = new BackgroundableProcessIndicator(treeGenerator);
-        ProgressManager.getInstance().runProcessWithProgressAsynchronously(treeGenerator, progressIndicator);
+        createAndRenderTreeImpl(method, includeSupers, includeOverrides);
+        
+        if (currentFrame != null)
+        {
+            historyBehind.push(currentFrame);
+        }
+        currentFrame = new HistoryFrame(method, includeSupers, includeOverrides);
     }
 
     public void finishCreatingTree(Tree tree)
     {
         this.tree = tree;
         treeView = new JBScrollPane(tree);
-        setLoading(false);
+        setRunning(false, false);
     }
 
     public void stop()
     {
-        tree = null;
-        treeView.removeAll();
-        forcedCancel = true;
         progressIndicator.cancel();
-        setLoading(false);
+        tree = null;
+        currentFrame = null; // we don't want this frame ending up in the history
+        setRunning(false, true);
+        userCanceled = true;
+    }
+
+    public void goBack()
+    {
+        if (!historyBehind.isEmpty()) // just a guard; corresponding button should already be disabled if this is true
+        {
+            if (currentFrame != null) // could happen if Stop was pressed
+            {
+                historyAhead.push(currentFrame);
+            }
+            currentFrame = historyBehind.pop();
+            createAndRenderTreeImpl(
+                currentFrame.method,
+                currentFrame.includeSupers,
+                currentFrame.includeOverrides
+            );
+        }
+    }
+
+    public void goForward()
+    {
+        if (!historyAhead.isEmpty()) // just a guard; corresponding button should already be disabled if this is true
+        {
+            if (currentFrame != null) // could happen if Stop was pressed
+            {
+                historyBehind.push(currentFrame);
+            }
+            currentFrame = historyAhead.pop();
+            createAndRenderTreeImpl(
+                currentFrame.method,
+                currentFrame.includeSupers,
+                currentFrame.includeOverrides
+            );
+        }
+    }
+
+    public void reset()
+    {
+        resetHistory(); // must reset history first for setRunning() to correctly see history vars in "reset" state
+        setRunning(false, true);
+    }
+
+    public void resetHistory()
+    {
+        currentFrame = null;
+        historyBehind.clear();
+        historyAhead.clear();
+    }
+
+    public void clearHistoryAhead()
+    {
+        historyAhead.clear();
+    }
+
+    public boolean userCanceled()
+    {
+        return userCanceled;
     }
 
     public JPanel getContent()
@@ -164,4 +202,62 @@ public class Plugin
     {
         return tree;
     }
+
+    private JComponent createToolbarPanel()
+    {
+        DefaultActionGroup result = new DefaultActionGroup();
+
+        Stream.concat(
+            generateActions.stream(),
+            postGenerateActions.stream()
+        ).forEach(action ->
+        {
+            if (action.isFirstInGroup())
+            {
+                result.addSeparator();
+            }
+            result.add(action);
+        });
+
+        ActionToolbar actionToolbar = ActionManager.getInstance()
+            .createActionToolbar(ActionPlaces.STRUCTURE_VIEW_TOOLBAR, result, true);
+        
+        // Suppress irrelevant build warning; see https://github.com/JetBrains/gradle-intellij-plugin/issues/777
+        actionToolbar.setTargetComponent(null);
+        
+        return actionToolbar.getComponent();
+    }
+
+    private void createAndRenderTreeImpl(PsiMethodImpl method, boolean includeSupers, boolean includeOverrides)
+    {
+        setRunning(true, true);
+
+        TreeGenerator treeGenerator = new TreeGenerator(this, project, method, includeSupers, includeOverrides);
+
+        progressIndicator = new BackgroundableProcessIndicator(treeGenerator);
+        ProgressManager.getInstance().runProcessWithProgressAsynchronously(treeGenerator, progressIndicator);
+    }
+
+    private void setRunning(boolean isRunning, boolean clearTree)
+    {
+        userCanceled = false;
+        if (clearTree)
+        {
+            treeView.removeAll();
+            treeView.repaint();
+        }
+        bottomPanel.removeAll();
+        bottomPanel.add(isRunning ? loadingPanel : treeView);
+
+        generateActions.forEach(action -> action.setEnabled(!isRunning));
+
+        stopFindUsagesAction.setEnabled(isRunning);
+        goBackAction.setEnabled(!isRunning && !historyBehind.empty());
+        goForwardAction.setEnabled(!isRunning && !historyAhead.empty());
+        expandAction.setEnabled(!isRunning && currentFrame != null);
+        collapseAction.setEnabled(!isRunning && currentFrame != null);
+        resetAction.setEnabled(!isRunning && currentFrame != null);
+    }
+
+    private record HistoryFrame(PsiMethodImpl method, boolean includeSupers, boolean includeOverrides) {}
 }

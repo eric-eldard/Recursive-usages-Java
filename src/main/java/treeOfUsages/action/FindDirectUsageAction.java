@@ -17,8 +17,8 @@ public class FindDirectUsageAction extends FindUsagesAction
     {
         super(
             plugin,
-            "Build Tree of Usages for method",
-            "Build tree of usages for method",
+            "Build Tree",
+            "Build a tree of usages for the method at the cursor or the method in the current tree which has focus",
             AllIcons.Nodes.Method,
             false,
             false

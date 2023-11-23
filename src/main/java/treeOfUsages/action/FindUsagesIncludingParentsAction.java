@@ -17,8 +17,8 @@ public class FindUsagesIncludingParentsAction extends FindUsagesAction
     {
         super(
             plugin,
-            "Build Tree of Usages (include immediate parent methods)",
-            "Build tree of usages (include immediate parent methods)",
+            "Build Tree (include immediate parents)",
+            "Build a tree of usages which includes methods the selected method directly overrides or implements",
             AllIcons.General.ImplementingMethod,
             true,
             false
