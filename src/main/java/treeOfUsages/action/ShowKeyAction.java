@@ -1,25 +1,25 @@
 package treeOfUsages.action;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import org.jetbrains.annotations.NotNull;
 import treeOfUsages.Plugin;
+import treeOfUsages.ProjectIcons;
 
-public class CollapseTreeAction extends EnableableAction
+public class ShowKeyAction extends EnableableAction
 {
     public Plugin plugin;
 
     @SuppressWarnings("unused")
-    public CollapseTreeAction()
+    public ShowKeyAction()
     {
     }
 
-    public CollapseTreeAction(Plugin plugin)
+    public ShowKeyAction(Plugin plugin)
     {
         super(
-            "Collapse All",
-            "Collapse all nodes in the current tree",
-            AllIcons.Actions.Collapseall
+            "Show Key",
+            "Show a key of icons used in Tree of Usages",
+            ProjectIcons.ShowKey
         );
         this.plugin = plugin;
     }
@@ -27,6 +27,12 @@ public class CollapseTreeAction extends EnableableAction
     @Override
     public void actionPerformed(@NotNull AnActionEvent e)
     {
-        plugin.collapseAll();
+        plugin.showKey();
+    }
+
+    @Override
+    public boolean isFirstInGroup()
+    {
+        return true;
     }
 }

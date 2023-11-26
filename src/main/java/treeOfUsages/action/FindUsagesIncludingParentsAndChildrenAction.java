@@ -2,6 +2,7 @@ package treeOfUsages.action;
 
 import com.intellij.icons.AllIcons;
 import treeOfUsages.Plugin;
+import treeOfUsages.ProjectIcons;
 
 /**
  * Find usages of method, including usages of overridden parent class methods and/or implemented interface methods and
@@ -20,7 +21,7 @@ public class FindUsagesIncludingParentsAndChildrenAction extends FindUsagesActio
             plugin,
             "Build Tree (include immediate parent and child methods)",
             "Build a tree of usages which includes both immediate parent and child methods",
-            AllIcons.Gutter.SiblingInheritedMethod,
+            ProjectIcons.SiblingMethod,
             true,
             true
         );

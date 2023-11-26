@@ -11,7 +11,9 @@ repositories {
     gradlePluginPortal()
 }
 
-def htmlFixer = { htmlFile -> file(htmlFile).text.replace('<html>', '').replace('</html>', '') }
+dependencies {
+    implementation 'one.util:streamex:0.8.2'
+}
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
@@ -25,6 +27,8 @@ intellij {
         "PsiViewer:${psiViewerPluginVersion}"
     ]
 }
+
+def htmlFixer = { htmlFile -> file(htmlFile).text.replace('<html>', '').replace('</html>', '') }
 
 patchPluginXml {
     version           = pluginVersion

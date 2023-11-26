@@ -11,6 +11,7 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.search.searches.OverridingMethodsSearch;
 import com.intellij.ui.RowIcon;
 import com.intellij.util.Query;
+import treeOfUsages.ProjectIcons;
 
 /**
  * An invocation of a method from a class
@@ -85,7 +86,7 @@ public class MethodNode implements UsageNode
 
             if (hasParent() && hasChild())
             {
-                icons.add(AllIcons.Gutter.SiblingInheritedMethod);
+                icons.add(ProjectIcons.SiblingMethodGutter);
             }
             else if (hasParent())
             {
@@ -120,7 +121,7 @@ public class MethodNode implements UsageNode
     /**
      * @return true if this method implements at least one interface or overrides a method from any parent class
      */
-    private boolean hasParent()
+    protected boolean hasParent()
     {
         return method.findSuperMethods().length > 0;
     }
@@ -128,7 +129,7 @@ public class MethodNode implements UsageNode
     /**
      * @return true if this method is overridden in at least one other class
      */
-    private boolean hasChild()
+    protected boolean hasChild()
     {
         Query<PsiMethod> overridingMethods = OverridingMethodsSearch.search(method, false);
         return overridingMethods.findFirst() != null;

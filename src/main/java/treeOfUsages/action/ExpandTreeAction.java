@@ -27,13 +27,7 @@ public class ExpandTreeAction extends EnableableAction
     @Override
     public void actionPerformed(@NotNull AnActionEvent e)
     {
-        if (plugin.getTree() != null)
-        {
-            for (int i = 0; i < plugin.getTree().getRowCount(); i++)
-            {
-                plugin.getTree().expandRow(i);
-            }
-        }
+        plugin.expandAll();
     }
 
     @Override

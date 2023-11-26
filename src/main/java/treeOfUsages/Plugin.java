@@ -1,20 +1,11 @@
 package treeOfUsages;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
-import java.util.stream.Stream;
-
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
+import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.impl.BackgroundableProcessIndicator;
 import com.intellij.openapi.project.Project;
@@ -23,6 +14,7 @@ import com.intellij.psi.impl.source.PsiMethodImpl;
 import com.intellij.ui.components.JBLoadingPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.treeStructure.Tree;
+import one.util.streamex.StreamEx;
 import treeOfUsages.action.CollapseTreeAction;
 import treeOfUsages.action.EnableableAction;
 import treeOfUsages.action.ExpandTreeAction;
@@ -33,8 +25,18 @@ import treeOfUsages.action.FindUsagesIncludingParentsAndChildrenAction;
 import treeOfUsages.action.GoBackAction;
 import treeOfUsages.action.GoForwardAction;
 import treeOfUsages.action.ResetAction;
+import treeOfUsages.action.ShowKeyAction;
 import treeOfUsages.action.StopFindUsagesAction;
-import treeOfUsages.util.TreeGenerator;
+import treeOfUsages.generator.KeyTreeGenerator;
+import treeOfUsages.generator.TreeGenerator;
+
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
 
 public class Plugin
 {
@@ -50,7 +52,7 @@ public class Plugin
 
     private JBScrollPane treeView;
 
-    private BackgroundableProcessIndicator progressIndicator;
+    private ProgressIndicator progressIndicator;
 
     private boolean userCanceled = false;
 
@@ -69,6 +71,8 @@ public class Plugin
     private final List<EnableableAction> generateActions = new ArrayList<>();
 
     private final List<EnableableAction> postGenerateActions = new ArrayList<>();
+
+    private final List<EnableableAction> alwaysOnActions = new ArrayList<>();
 
     private final Stack<HistoryFrame> historyBehind = new Stack<>();
 
@@ -93,6 +97,8 @@ public class Plugin
         postGenerateActions.add(resetAction);
         postGenerateActions.add(expandAction);
         postGenerateActions.add(collapseAction);
+
+        alwaysOnActions.add(new ShowKeyAction(this));
 
         JComponent toolbarPanel = createToolbarPanel();
         generalPanel.add(toolbarPanel, BorderLayout.NORTH);
@@ -188,6 +194,34 @@ public class Plugin
         historyAhead.clear();
     }
 
+    public void expandAll()
+    {
+        if (tree != null)
+        {
+            for (int i = 0; i < tree.getRowCount(); i++)
+            {
+                tree.expandRow(i);
+            }
+        }
+    }
+
+    public void collapseAll()
+    {
+        if (tree != null)
+        {
+            for (int i = tree.getRowCount() - 1; i >= 0; i--)
+            {
+                tree.collapseRow(i);
+            }
+        }
+    }
+
+    public void showKey()
+    {
+        ProgressManager.getInstance().runProcess(() -> new KeyTreeGenerator(this).run(), null);
+        expandAll();
+    }
+
     public boolean userCanceled()
     {
         return userCanceled;
@@ -207,17 +241,17 @@ public class Plugin
     {
         DefaultActionGroup result = new DefaultActionGroup();
 
-        Stream.concat(
-            generateActions.stream(),
-            postGenerateActions.stream()
-        ).forEach(action ->
-        {
-            if (action.isFirstInGroup())
+        StreamEx.of(generateActions)
+            .append(postGenerateActions)
+            .append(alwaysOnActions)
+            .forEach(action ->
             {
-                result.addSeparator();
-            }
-            result.add(action);
-        });
+                if (action.isFirstInGroup())
+                {
+                    result.addSeparator();
+                }
+                result.add(action);
+            });
 
         ActionToolbar actionToolbar = ActionManager.getInstance()
             .createActionToolbar(ActionPlaces.STRUCTURE_VIEW_TOOLBAR, result, true);

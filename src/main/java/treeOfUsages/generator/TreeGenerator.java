@@ -1,15 +1,4 @@
-package treeOfUsages.util;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
+package treeOfUsages.generator;
 
 import com.google.common.collect.SortedMultiset;
 import com.google.common.collect.TreeMultiset;
@@ -39,6 +28,17 @@ import treeOfUsages.TreeRenderer;
 import treeOfUsages.node.HiddenNode;
 import treeOfUsages.node.MethodNode;
 import treeOfUsages.node.UsageNode;
+import treeOfUsages.node.UsageNodeFactory;
+
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class TreeGenerator extends Task.Backgroundable
 {

@@ -1,4 +1,4 @@
-package treeOfUsages.util;
+package treeOfUsages.node;
 
 import javax.swing.Icon;
 
@@ -7,9 +7,6 @@ import com.intellij.psi.NavigatablePsiElement;
 import com.intellij.psi.PsiMethod;
 import com.intellij.testIntegration.TestFinderHelper;
 import com.intellij.util.PlatformIcons;
-import treeOfUsages.node.ClassNode;
-import treeOfUsages.node.MethodNode;
-import treeOfUsages.node.UsageNode;
 
 public class UsageNodeFactory
 {
