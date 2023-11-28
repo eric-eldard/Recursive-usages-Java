@@ -1,5 +1,5 @@
 <idea-plugin>
-    <id>org.endpointdeps.Recursive-usages-Java</id>
+    <id>us.marseilles.Tree-of-Usages-Java</id>
     <name>Tree of Usages - Java</name>
     <vendor>Timur Mukhatov, Eric Eldard</vendor>
     <version><![CDATA[ Replaced by gradle.properties pluginVersion]]></version>

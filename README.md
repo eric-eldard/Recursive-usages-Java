@@ -1,4 +1,4 @@
-# Tree of Usages (Recursive usages) - Java
+# Tree of Usages - Java
 
 Forked from [RPGer/Recursive-usages](https://github.com/RPGer/Recursive-usages)
 
@@ -14,7 +14,7 @@ From this directory, run
 ![Install From Disk](img/install-from-disk.png)
 1. Navigate to Settings > Plugins
 2. Choose "Install Plugin from Disk..."
-3. Select `Recursive-usages-Java/build/distributions/Recursive-usages-Java-2.1.1.zip`
+3. Select `Tree-of-Usages-Java/build/distributions/Tree-of-Usages-Java-2.1.1.zip`
 4. Restart IntelliJ and wait for indexing to complete
 
 ### To Use
