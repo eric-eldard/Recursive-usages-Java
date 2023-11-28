@@ -90,6 +90,7 @@ public class KeyTreeGenerator extends Task.Backgroundable
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
         plugin.finishCreatingTree(tree);
+        plugin.expandAll();
         
         indicator.setFraction(1.0);
     }

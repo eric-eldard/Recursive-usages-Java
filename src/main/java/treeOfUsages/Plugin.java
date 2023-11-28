@@ -243,8 +243,6 @@ public class Plugin
 
         progressIndicator = new BackgroundableProcessIndicator(keyTreeGenerator);
         ProgressManager.getInstance().runProcessWithProgressAsynchronously(keyTreeGenerator, progressIndicator);
-        
-        expandAll();
     }
 
     public boolean userCanceled()

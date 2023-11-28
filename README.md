@@ -3,7 +3,7 @@
 Forked from [RPGer/Recursive-usages](https://github.com/RPGer/Recursive-usages)
 
 This IntelliJ plugin helps to recursively find all usages of a Java method and creates a tree of those usages.
-When changing a method, this allows you to see what other methods it will affect.
+Use it to walk your call trees and understand the impact of your changes.
 
 ### To Build
 From this directory, run
@@ -14,7 +14,7 @@ From this directory, run
 ![Install From Disk](img/install-from-disk.png)
 1. Navigate to Settings > Plugins
 2. Choose "Install Plugin from Disk..."
-3. Select `Recursive-usages-Java/build/distributions/Recursive-usages-Java-2.1.zip`
+3. Select `Recursive-usages-Java/build/distributions/Recursive-usages-Java-2.1.1.zip`
 4. Restart IntelliJ and wait for indexing to complete
 
 ### To Use

@@ -1,6 +1,18 @@
 <html>
 <p>Forked from <a href="https://github.com/RPGer/Recursive-usages">RPGer/Recursive-usages</a> and rewritten to support
-building a tree of usages of Java methods.</p>
+building a tree of usages of Java methods. Use it to walk your call trees and understand the impact of your changes.</p>
+
+<h2>Supports</h2>
+<ul>
+    <li>Standard instance method usages</li>
+    <li>Usages as method references</li>
+    <li>Static method usages</li>
+    <li>Method usages in static initialization blocks</li>
+    <li>Method usages in field initializations</li>
+    <li>Usages of immediate parents of method</li>
+    <li>Usages of immediate children of method</li>
+    <li>A history of discovered usage trees</li>
+</ul>
 
 <p>Does not yet support usages of methods in declarative contexts, like SpEL and XML. No Lombok support.</p>
 </html>
