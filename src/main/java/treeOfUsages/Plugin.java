@@ -68,10 +68,19 @@ public class Plugin
 
     private final EnableableAction collapseAction = new CollapseTreeAction(this);
 
+    /**
+     * Actions which generate a new tree
+     */
     private final List<EnableableAction> generateActions = new ArrayList<>();
 
+    /**
+     * Actions which can be performed on a generated tree
+     */
     private final List<EnableableAction> postGenerateActions = new ArrayList<>();
 
+    /**
+     * Actions which are always available (except while a tree is being generated)
+     */
     private final List<EnableableAction> alwaysOnActions = new ArrayList<>();
 
     private final Stack<HistoryFrame> historyBehind = new Stack<>();
@@ -218,7 +227,23 @@ public class Plugin
 
     public void showKey()
     {
-        ProgressManager.getInstance().runProcess(() -> new KeyTreeGenerator(this).run(), null);
+        setRunning(true, true);
+
+        // The key will not be added to the history. But if there is an existing frame and/or existing history, we'll
+        // preserve that and allow the user to return to their previous result. If the user was somewhere in the middle
+        // of their history, they'll also be able to go forward from the key; when they then go back, they'll go back to
+        // the previous result in history.
+        if (currentFrame != null)
+        {
+            historyBehind.push(currentFrame);
+        }
+        currentFrame = null;
+
+        KeyTreeGenerator keyTreeGenerator = new KeyTreeGenerator(this, project);
+
+        progressIndicator = new BackgroundableProcessIndicator(keyTreeGenerator);
+        ProgressManager.getInstance().runProcessWithProgressAsynchronously(keyTreeGenerator, progressIndicator);
+        
         expandAll();
     }
 
@@ -283,7 +308,9 @@ public class Plugin
         bottomPanel.removeAll();
         bottomPanel.add(isRunning ? loadingPanel : treeView);
 
-        generateActions.forEach(action -> action.setEnabled(!isRunning));
+        StreamEx.of(generateActions)
+            .append(alwaysOnActions)
+            .forEach(action -> action.setEnabled(!isRunning));
 
         stopFindUsagesAction.setEnabled(isRunning);
         goBackAction.setEnabled(!isRunning && !historyBehind.empty());

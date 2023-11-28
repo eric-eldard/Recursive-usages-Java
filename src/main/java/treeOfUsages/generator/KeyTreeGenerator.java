@@ -1,8 +1,12 @@
 package treeOfUsages.generator;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.PlatformIcons;
+import org.jetbrains.annotations.NotNull;
 import treeOfUsages.Plugin;
 import treeOfUsages.TreeRenderer;
 import treeOfUsages.node.MethodNode;
@@ -11,18 +15,20 @@ import javax.swing.Icon;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
 
-public class KeyTreeGenerator
+public class KeyTreeGenerator extends Task.Backgroundable
 {
     private static final String SOME_CLASS = "SomeClass";
 
     private final Plugin plugin;
 
-    public KeyTreeGenerator(Plugin plugin)
+    public KeyTreeGenerator(Plugin plugin, Project project)
     {
+        super(project, "Generating Tree of Usages key", false);
         this.plugin = plugin;
     }
 
-    public void run()
+    @Override
+    public void run(@NotNull ProgressIndicator indicator)
     {
         MethodNode rootMethod = new ExampleMethodNode(
             "your method",
