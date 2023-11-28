@@ -30,6 +30,8 @@ public class KeyTreeGenerator extends Task.Backgroundable
     @Override
     public void run(@NotNull ProgressIndicator indicator)
     {
+        indicator.setFraction(0.0);
+        
         MethodNode rootMethod = new ExampleMethodNode(
             "your method",
             SOME_CLASS);
@@ -88,6 +90,8 @@ public class KeyTreeGenerator extends Task.Backgroundable
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
         plugin.finishCreatingTree(tree);
+        
+        indicator.setFraction(1.0);
     }
 
     private static class ExampleMethodNode extends MethodNode
