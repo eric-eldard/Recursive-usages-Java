@@ -5,11 +5,14 @@ import javax.swing.Icon;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.util.NlsActions;
+import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class EnableableAction extends AnAction
 {
+    @Getter @Setter
     private boolean enabled = true;
 
     @SuppressWarnings("unused")
@@ -30,16 +33,6 @@ public abstract class EnableableAction extends AnAction
     {
         e.getPresentation().setEnabled(enabled);
         super.update(e);
-    }
-
-    public boolean isEnabled()
-    {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled)
-    {
-        this.enabled = enabled;
     }
 
     public boolean isFirstInGroup()

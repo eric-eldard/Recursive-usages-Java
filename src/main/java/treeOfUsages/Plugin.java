@@ -14,6 +14,7 @@ import com.intellij.psi.impl.source.PsiMethodImpl;
 import com.intellij.ui.components.JBLoadingPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.treeStructure.Tree;
+import lombok.Getter;
 import one.util.streamex.StreamEx;
 import treeOfUsages.action.CollapseTreeAction;
 import treeOfUsages.action.EnableableAction;
@@ -48,6 +49,7 @@ public class Plugin
 
     private final Project project;
 
+    @Getter
     private Tree tree;
 
     private JBScrollPane treeView;
@@ -253,11 +255,6 @@ public class Plugin
     public JPanel getContent()
     {
         return generalPanel;
-    }
-
-    public Tree getTree()
-    {
-        return tree;
     }
 
     private JComponent createToolbarPanel()

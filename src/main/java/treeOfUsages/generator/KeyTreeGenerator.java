@@ -1,17 +1,15 @@
 package treeOfUsages.generator;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.Tree;
-import com.intellij.util.PlatformIcons;
 import org.jetbrains.annotations.NotNull;
 import treeOfUsages.Plugin;
 import treeOfUsages.TreeRenderer;
+import treeOfUsages.node.ClassNode;
 import treeOfUsages.node.MethodNode;
 
-import javax.swing.Icon;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -63,14 +61,12 @@ public class KeyTreeGenerator extends Task.Backgroundable
             SOME_CLASS);
         siblingMethod.markHasParent();
         siblingMethod.markHasChild();
-        MethodNode testMethod = new ExampleMethodNode(
+        ExampleMethodNode testMethod = new ExampleMethodNode(
             "a test method that calls your method",
-            "SomeTestClass",
-            AllIcons.Actions.StartDebugger);
-        MethodNode classMethod = new ExampleMethodNode(
-            "a class-level usage of your method to initialize a field or from within a static initializer",
-            null,
-            PlatformIcons.CLASS_ICON);
+            "SomeTestClass");
+        testMethod.markTest();
+        ClassNode classMethod = new ExampleClassNode(
+            "a class-level usage of your method to initialize a field or from within a static initializer");
 
         DefaultMutableTreeNode rootNode  = new DefaultMutableTreeNode(rootMethod);
         rootNode.add(new DefaultMutableTreeNode(callingMethod));
@@ -99,19 +95,13 @@ public class KeyTreeGenerator extends Task.Backgroundable
     {
         private final String mainText;
         private final String additionalText;
+        private boolean test;
         private boolean hasParent;
         private boolean hasChild;
 
         public ExampleMethodNode(String mainText, String additionalText)
         {
-            super(AllIcons.Nodes.Method, null, 0, 1);
-            this.mainText = mainText;
-            this.additionalText = additionalText;
-        }
-
-        public ExampleMethodNode(String mainText, String additionalText, Icon icon)
-        {
-            super(icon, null, 0, 1);
+            super(null, 0, 1);
             this.mainText = mainText;
             this.additionalText = additionalText;
         }
@@ -129,15 +119,26 @@ public class KeyTreeGenerator extends Task.Backgroundable
         }
 
         @Override
-        protected boolean hasParent()
+        public boolean isTest()
+        {
+            return test;
+        }
+
+        @Override
+        public boolean hasParent()
         {
             return hasParent;
         }
 
         @Override
-        protected boolean hasChild()
+        public boolean hasChild()
         {
             return hasChild;
+        }
+
+        private void markTest()
+        {
+            this.test = true;
         }
 
         private void markHasParent()
@@ -148,6 +149,23 @@ public class KeyTreeGenerator extends Task.Backgroundable
         private void markHasChild()
         {
             this.hasChild = true;
+        }
+    }
+
+    private static class ExampleClassNode extends ClassNode
+    {
+        private final String mainText;
+
+        public ExampleClassNode(String mainText)
+        {
+            super(null);
+            this.mainText = mainText;
+        }
+
+        @Override
+        public String getMainText()
+        {
+            return mainText;
         }
     }
 }

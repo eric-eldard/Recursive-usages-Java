@@ -25,10 +25,10 @@ import com.intellij.util.Query;
 import org.jetbrains.annotations.NotNull;
 import treeOfUsages.Plugin;
 import treeOfUsages.TreeRenderer;
+import treeOfUsages.node.ClassNode;
 import treeOfUsages.node.HiddenNode;
 import treeOfUsages.node.MethodNode;
 import treeOfUsages.node.UsageNode;
-import treeOfUsages.node.UsageNodeFactory;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
@@ -98,7 +98,7 @@ public class TreeGenerator extends Task.Backgroundable
 
     private Tree generateUsageTree(PsiMethodImpl element) throws ProcessCanceledException
     {
-        MethodNode classNode = (MethodNode) UsageNodeFactory.createMethodNode(element, 0, 1);
+        MethodNode classNode = new MethodNode(element, 0, 1);
         DefaultMutableTreeNode methodNode = new DefaultMutableTreeNode(classNode);
         recursiveGenerator(methodNode);
 
@@ -118,7 +118,7 @@ public class TreeGenerator extends Task.Backgroundable
 
         // include immediate parent/interface and child usages
         List<DefaultMutableTreeNode> parentAndChildNodes = parentAndChildMethods.stream()
-            .map(psiMethod -> UsageNodeFactory.createMethodNode(psiMethod, 0, 1))
+            .map(psiMethod -> new MethodNode(psiMethod, 0, 1))
             .map(usageNode -> recursiveGenerator(new DefaultMutableTreeNode(usageNode)))
             .toList();
         
@@ -170,7 +170,7 @@ public class TreeGenerator extends Task.Backgroundable
             else if (psiElement instanceof PsiMethodReferenceExpressionImpl || // field-level usage
                 psiElement instanceof PsiReferenceExpressionImpl)              // static initializer usage
             {
-                UsageNode caller = UsageNodeFactory.createFileNode(psiElement);
+                UsageNode caller = new ClassNode(psiElement);
                 DefaultMutableTreeNode callingNode = new DefaultMutableTreeNode(caller);
 
                 parentNode.add(callingNode);
@@ -182,11 +182,9 @@ public class TreeGenerator extends Task.Backgroundable
 
     private void processMethodUsage(DefaultMutableTreeNode parentNode, PsiMethodImpl methodImpl, int occurrences)
     {
-        MethodNode callingMethod = (MethodNode) UsageNodeFactory.createMethodNode(
-            methodImpl,
-            ((MethodNode) parentNode.getUserObject()).getDepth() + 1,
-            occurrences
-        );
+        int depth = ((MethodNode) parentNode.getUserObject()).getDepth() + 1;
+        MethodNode callingMethod = new MethodNode(methodImpl, depth, occurrences);
+
         flagDuplicateMethodNodes(callingMethod);
 
         DefaultMutableTreeNode callingNode = new DefaultMutableTreeNode(callingMethod);
